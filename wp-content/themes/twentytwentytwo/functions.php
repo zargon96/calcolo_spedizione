@@ -341,7 +341,7 @@ function shipping_calculator_shortcode() {
     if ($csv_file !== false) {
         // Read the CSV file line by line and parse it
         while (($data = fgetcsv($csv_file, 0, ';')) !== false) {
-            // Convert numeric values by replacing comma with dot
+            // Convert numeric values by replacing comma with dot 
             $data = array_map(function($value) {
                 return is_numeric($value) ? str_replace(',', '.', $value) : $value;
             }, $data);
