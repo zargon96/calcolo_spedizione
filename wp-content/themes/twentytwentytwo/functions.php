@@ -387,8 +387,8 @@ function shipping_calculator_shortcode() {
 
     echo '</select>
             <input type="checkbox" name="sponda_idraulica" id="sponda_idraulica">
-            <label for="sponda_idraulica">Sponda Idraulica</label>
-            <button type="submit">Calcola</button>
+            <label for="sponda_idraulica">Consegna con sponda idraulica</label>
+            <button type="submit">Calcola tariffa</button>
           </form>
           <div id="result"></div>';
 
@@ -433,15 +433,13 @@ function shipping_calculator_shortcode() {
             if (spondaIdraulica) {
                 costoSpedizione += 50; // Costo fisso per la sponda idraulica
                 costoSpedizione *= 1.03; // Aggiunge il 3% al costo totale
-                console.log('Costo spedizione dopo sponda idraulica:', costoSpedizione); // Debug dopo aggiunta sponda idraulica
+                console.log('Costo spedizione dopo sponda idraulica:', costoSpedizione); // Debug
             }
     
             // Applica un aumento del 10% se la spedizione non parte da Firenze o Prato
             if (!partenzaDaFirenzePrato) {
                 costoSpedizione *= 1.10;
             }
-    
-            console.log('Costo spedizione finale:', costoSpedizione); // Debug del costo finale di spedizione
     
             // Mostra il costo finale di spedizione
             document.getElementById('result').innerText = 'Il costo di spedizione è: € ' + costoSpedizione.toFixed(2);
