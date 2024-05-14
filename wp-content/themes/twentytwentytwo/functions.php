@@ -226,7 +226,18 @@ function shipping_calculator_shortcode() {
                 <div class="form-group">
                     <label for="tipo_pallet">Tipo di Pallet:</label>
                     <select name="tipo_pallet" class="form-control" id="tipo_pallet" data-calc="true" required>
-                        <!-- Opzioni aggiornate dinamicamente -->
+                        <?php
+                        // Popola le opzioni del tipo di pallet in base ai dati caricati
+                        foreach ($rates as $province => $methods) {
+                            foreach ($methods as $pallets) {
+                                foreach ($pallets as $palletType) {
+                                    echo "<option value='$palletType'>$palletType</option>";
+                                }
+                                // Una volta popolate le opzioni per un metodo, non è necessario ripeterle
+                                break 2;
+                            }
+                        }
+                        ?>
                     </select>
                 </div>
             </div>
@@ -241,10 +252,11 @@ function shipping_calculator_shortcode() {
                     </select>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <button type="button" class="btn btn-primary" id="calculateButton">Calcola tariffa</button>
             </div>
         </div>
+        
         <div class="col-md-12">
             <div id="result"></div>
         </div>
@@ -341,6 +353,8 @@ function shipping_calculator_shortcode() {
                 if (xhr.status === 200) {
                     document.getElementById('result').innerText = 'Il costo di spedizione è: €' + xhr.responseText;
                     datiPersonaliDiv.classList.remove('hidden');
+                } else {
+                    alert('Errore nel calcolo del costo di spedizione!');
                 }
             };
             xhr.send('action=calculate_shipping&partenza=' + partenza + '&destinazione=' + destinazione + '&tipoSpedizione=' + tipoSpedizione + '&tipoPallet=' + tipoPallet + '&opzioniAggiuntive=' + opzioniAggiuntive);
@@ -381,6 +395,8 @@ function shipping_calculator_shortcode() {
                 if (xhr.status === 200) {
                     // Reindirizza alla stessa pagina con parametro di query success=1
                     window.location.href = window.location.href.split('?')[0] + '?success=1';
+                } else {
+                    alert('Errore nell" invio della richiesta!');
                 }
             };
             xhr.send('action=submit_request&nome=' + nome + '&cognome=' + cognome + '&indirizzo=' + indirizzo + '&telefono=' + telefono + '&email=' + email + '&dataNascita=' + dataNascita + '&partenza=' + partenza + '&destinazione=' + destinazione + '&tipoSpedizione=' + tipoSpedizione + '&tipoPallet=' + tipoPallet + '&opzioniAggiuntive=' + opzioniAggiuntive + '&costoSpedizione=' + costoSpedizione);
@@ -499,6 +515,7 @@ function submit_request() {
     echo 'Richiesta inviata con successo';
     wp_die();
 }
+
 
 
 
