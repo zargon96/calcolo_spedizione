@@ -484,15 +484,17 @@ function submit_request() {
     $indirizzo = sanitize_text_field($_POST['indirizzo']);
     $telefono = sanitize_text_field($_POST['telefono']);
     $email = sanitize_email($_POST['email']);
-    $dataNascita = sanitize_text_field($_POST['data_nascita']);
+    $dataNascita = sanitize_text_field($_POST['dataNascita']);
     $partenza = sanitize_text_field($_POST['partenza']);
     $destinazione = sanitize_text_field($_POST['destinazione']);
-    $tipoSpedizione = sanitize_text_field($_POST['tipo_spedizione']);
-    $tipoPallet = sanitize_text_field($_POST['tipo_pallet']);
-    $opzioniAggiuntive = sanitize_text_field($_POST['opzioni_aggiuntive']);
-    $costoSpedizione = sanitize_text_field($_POST['costo_spedizione']);
+    $tipoSpedizione = sanitize_text_field($_POST['tipoSpedizione']);
+    $tipoPallet = sanitize_text_field($_POST['tipoPallet']);
+    $opzioniAggiuntive = sanitize_text_field($_POST['opzioniAggiuntive']);
+    $costoSpedizione = sanitize_text_field($_POST['costoSpedizione']);
 
-    // Costruisci il corpo dell'e-mail
+    // Invia l' email (libreria PHPMailer)
+    $to = $email;
+    $subject = 'Dettagli della Richiesta di Spedizione';
     $body = "
         Nome: $nome\n
         Cognome: $cognome\n
@@ -507,23 +509,12 @@ function submit_request() {
         Opzioni aggiuntive: $opzioniAggiuntive\n
         Costo di Spedizione: €$costoSpedizione\n
     ";
-
-    // Invia l'e-mail all'utente
-    $to = $email;
-    $subject = 'Dettagli della Richiesta di Spedizione';
     $headers = ['Content-Type: text/plain; charset=UTF-8'];
+    wp_mail($to, $subject, $body, $headers);
 
-    $mail_sent = wp_mail($to, $subject, $body, $headers);
-
-    if ($mail_sent) {
-        echo 'Richiesta inviata con successo';
-    } else {
-        echo 'Errore nell\'invio della richiesta. Per favore, riprova.';
-    }
-
+    echo 'Richiesta inviata con successo';
     wp_die();
 }
-
 
 
 
