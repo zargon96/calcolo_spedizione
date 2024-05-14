@@ -64,6 +64,24 @@ add_action( 'wp_enqueue_scripts', 'twentytwentytwo_styles' );
 // Add block patterns
 require get_template_directory() . '/inc/block-patterns.php';
 
+/**
+ * Enqueue Bootstrap CSS and JS.
+ */
+function add_bootstrap_to_wp() {
+    // Bootstrap CSS
+    wp_enqueue_style('bootstrap-css', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css', array(), '4.5.2');
+
+    // Custom CSS (if any)
+    wp_enqueue_style('custom-style', get_stylesheet_uri());
+
+    // jQuery
+    wp_enqueue_script('jquery');
+
+    // Bootstrap JS
+    wp_enqueue_script('bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js', array('jquery'), '4.5.2', true);
+}
+add_action('wp_enqueue_scripts', 'add_bootstrap_to_wp');
+
 /***************************solo lettura del file csv per vedere se lo leggeva*********************************/
 // // Funzione per leggere e visualizzare il CSV come tabella HTML
 // function shipping_calculator_shortcode($atts) {
@@ -100,162 +118,19 @@ require get_template_directory() . '/inc/block-patterns.php';
 // }
 // add_shortcode('shipping_calculator', 'shipping_calculator_shortcode');
 
-// function shipping_calculator_shortcode() {
-//     ob_start(); // Start output buffering
-
-//     // Define the path to the CSV file
-//     $csv_file_path = get_template_directory() . '/tariffe_consegna.csv';
-
-//     // Attempt to open the CSV file
-//     $csv_file = fopen($csv_file_path, 'r');
-//     $csv = array();
-//     $headers = array();
-//     if ($csv_file !== false) {
-//         // Read the CSV file line by line and parse it
-//         while (($data = fgetcsv($csv_file, 0, ';')) !== false) {
-//            // echo '<pre>'; print_r($data);
-//             // Convert numeric values by replacing comma with dot  
-//             $data = array_map(function($value) {
-//                 return is_numeric($value) ? str_replace(',', '.', $value) : $value; 
-//             }, $data);
-//             $csv[] = $data;
-//         }
-//         fclose($csv_file);
-
-//         // Use the first row to define array keys and remove it
-//         $headers = array_shift($csv);
-//         $csv = array_map(function($row) use ($headers) {
-//             return array_combine($headers, $row);
-//         }, $csv);
-//        //echo '<pre>'; print_r($csv); exit;
-//     } else {
-//         echo '<p>Nessun file CSV.</p>';
-//     }
-
-//     // Convert CSV data to JSON for JavaScript
-//     $json_data = json_encode($csv);
-//     echo "<script>console.log('JSON Data:', $json_data);</script>";
-
-//     // HTML form part with dynamically populated dropdowns
-//     echo '<form id="spedizioneForm">
-//             <label for="tipo_pallet">Tipo di Pallet:</label>
-//             <select name="tipo_pallet" id="tipo_pallet">';
-    
-//     // Assume pallet types follow a specific pattern and exclude non-pallet columns
-//     $pallet_types = array_filter($headers, function($header) {
-//         return in_array($header, ['FP', 'LP', 'ULP', 'HP', 'ELP', 'QP', 'MQP']); // List of all possible pallet types
-//     });
-
-//     foreach ($pallet_types as $pallet_type) {
-//         echo '<option value="' . htmlspecialchars($pallet_type) . '">' . htmlspecialchars($pallet_type) . '</option>';
-//     }
-
-//     echo '</select>
-//             <label for="partenza">Partenza:</label>
-//             <select name="partenza" id="partenza">';
-
-//     echo '</select>
-//             <label for="destinazione">Provincia:</label>
-//             <select name="destinazione" id="destinazione">';
-    
-//     // Populate destinations from CSV data
-//     foreach ($csv as $row) {
-//         echo '<option value="' . htmlspecialchars($row['Provincia']) . '">' . htmlspecialchars($row['Provincia']) . '</option>';
-//     }
-
-//     echo '</select>
-//             <input type="checkbox" name="sponda_idraulica" id="sponda_idraulica">
-//             <label for="sponda_idraulica">Consegna con sponda idraulica</label>
-//             <button type="submit">Calcola tariffa</button>
-//           </form>
-//           <div id="result"></div>';
-
-//     // Inline JavaScript for processing the form and calculating the shipping cost
-//     echo "<script>
-//     document.addEventListener('DOMContentLoaded', function() {
-//         const form = document.getElementById('spedizioneForm');
-//         let data = JSON.parse('$json_data');
-    
-//         // Converti i numeri con virgole in numeri con punti decimali
-//         data = data.map(row => {
-//             Object.keys(row).forEach(key => {
-//                 if (!isNaN(parseFloat(row[key].replace(',', '.')))) {
-//                     row[key] = parseFloat(row[key].replace(',', '.'));
-//                 }
-//             });
-//             return row;
-//         });
-    
-//         form.addEventListener('submit', function(e) {
-//             e.preventDefault();
-    
-//             let tipoPallet = document.getElementById('tipo_pallet').value;
-//             let destinazione = document.getElementById('destinazione').value;
-//             let spondaIdraulica = document.getElementById('sponda_idraulica').checked;
-    
-//             let tariffaBase = 0;
-//             let partenzaDaFirenzePrato = (destinazione === 'FI' || destinazione === 'PO');
-    
-//             // Calcola la tariffa base in base al tipo di pallet e alla destinazione
-//             data.forEach(function(row) {
-//                 if (row['Provincia'] === destinazione && typeof row[tipoPallet] === 'number') {
-//                     tariffaBase = row[tipoPallet];
-//                 }
-//             });
-    
-//             console.log('Tariffa base:', tariffaBase); // Debug della tariffa base calcolata
-    
-//             let costoSpedizione = tariffaBase;
-    
-//             // Aggiunge il costo per la sponda idraulica e il 3% extra se necessario
-//             if (spondaIdraulica) {
-//                 costoSpedizione += 50; // Costo fisso per la sponda idraulica
-//                 costoSpedizione *= 1.03; // Aggiunge il 3% al costo totale
-//                 console.log('Costo spedizione dopo sponda idraulica:', costoSpedizione); // Debug
-//             }
-    
-//             // Applica un aumento del 10% se la spedizione non parte da Firenze o Prato
-//             if (!partenzaDaFirenzePrato) {
-//                 costoSpedizione *= 1.10;
-//             }
-    
-//             // Mostra il costo finale di spedizione
-//             document.getElementById('result').innerText = 'Il costo di spedizione è: € ' + costoSpedizione.toFixed(2);
-//             document.getElementById('paypalAmount').value = costoSpedizione.toFixed(2);
-//             document.querySelector('#paypalForm input[type=\"image\"]').disabled = false;
-//         });
-//     });
-    
-//     </script>";
-
-//     echo "<style>
-//        #paypalForm input[type='image'][disabled] {
-//         opacity: 0.5; 
-//         cursor: not-allowed;
-//       }
-//       </style>";
-
-//     echo "<form id='paypalForm' action='https://www.paypal.com/cgi-bin/webscr' method='post'>
-//             <input type='hidden' name='cmd' value='_xclick'>
-//             <input type='hidden' name='business' value='YOUR_PAYPAL_EMAIL'>
-//             <input type='hidden' name='item_name' value='Shipping Cost'>
-//             <input type='hidden' name='amount' id='paypalAmount'>
-//             <input type='hidden' name='currency_code' value='EUR'>
-//             <input type='hidden' name='notify_url' value='IPN_NOTIFICATION_URL'>
-//             <input type='hidden' name='return' value='RETURN_URL_AFTER_PAYMENT'>
-//             <input type='hidden' name='cancel_return' value='CANCEL_URL'>
-//             <input type='image' src='https://www.paypalobjects.com/webstatic/en_US/i/buttons/checkout-logo-large.png' border='0' name='submit' alt='PayPal - The safer, easier way to pay online!'disabled='disabled'>
-//             <img alt='' border='0' src='https://www.paypalobjects.com/en_US/i/scr/pixel.gif' width='1' height='1'>
-//         </form>";
-
-//     return ob_get_clean(); // Return and clean the output buffer
-// }
-
-// add_shortcode('shipping_calculator', 'shipping_calculator_shortcode');
-
 
 function shipping_calculator_shortcode() {
     ob_start(); // Inizia a memorizzare l'output
+
+    // Mostra l'alert di successo se il parametro di query `success` è presente
+    if (isset($_GET['success']) && $_GET['success'] == 1) {
+        echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
+                Richiesta inviata con successo.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+              </div>';
+    }
 
     // Definisce il percorso al file CSV
     $csv_file_path = get_template_directory() . '/tariffe_consegna.csv';
@@ -292,35 +167,132 @@ function shipping_calculator_shortcode() {
 
     // Form HTML con menu a tendina popolati dinamicamente
     ?>
-    <form id="spedizioneForm">
-        <label for="partenza">Partenza:</label>
-        <select name="partenza" id="partenza">
-            <?php foreach ($provinces as $province) {
-                echo "<option value='$province'>$province</option>";
-            } ?>
-        </select>
-        <label for="destinazione">Destinazione:</label>
-        <select name="destinazione" id="destinazione">
-            <?php foreach ($provinces as $province) {
-                echo "<option value='$province'>$province</option>";
-            } ?>
-        </select>
-        <label for="tipo_spedizione">Tipo di Spedizione:</label>
-        <select name="tipo_spedizione" id="tipo_spedizione">
-            <option value="express">Express</option>
-            <option value="standard">Standard</option>
-        </select>
-        <label for="tipo_pallet">Tipo di Pallet:</label>
-        <select name="tipo_pallet" id="tipo_pallet">
-            <!-- Opzioni aggiornate dinamicamente -->
-        </select>
-        <input type="checkbox" name="sponda_idraulica" id="sponda_idraulica">
-        <label for="sponda_idraulica">Consegna con sponda idraulica</label>
-        <button type="button" onclick="calculateShipping()">Calcola tariffa</button>
-        <button type="button" onclick="submitRequest()">Invia richiesta</button>
+    <style>
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group select, .form-group input[type="text"], .form-group input[type="email"], .form-group input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        #requestResult {
+            margin-top: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+    <form id="spedizioneForm" class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="partenza">Partenza:</label>
+                    <select name="partenza" class="form-control" id="partenza" data-calc="true" required>
+                        <?php foreach ($provinces as $province) {
+                            echo "<option value='$province'>$province</option>";
+                        } ?>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="destinazione">Destinazione:</label>
+                    <select name="destinazione" class="form-control" id="destinazione" data-calc="true" required>
+                        <?php foreach ($provinces as $province) {
+                            echo "<option value='$province'>$province</option>";
+                        } ?>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="tipo_spedizione">Tipo di Spedizione:</label>
+                    <select name="tipo_spedizione" class="form-control" id="tipo_spedizione" data-calc="true" required>
+                        <option value="express">Express</option>
+                        <option value="standard">Standard</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="tipo_pallet">Tipo di Pallet:</label>
+                    <select name="tipo_pallet" class="form-control" id="tipo_pallet" data-calc="true" required>
+                        <!-- Opzioni aggiornate dinamicamente -->
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="opzioni_aggiuntive">Opzioni aggiuntive:</label>
+                    <select name="opzioni_aggiuntive" class="form-control" id="opzioni_aggiuntive">
+                        <option value="none">Nessuna</option>
+                        <option value="sponda_idraulica">Consegna con sponda idraulica</option>
+                        <option value="assicurazione">Assicurazione</option>
+                        <option value="consegna_rapida">Consegna rapida</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <button type="button" class="btn btn-primary" id="calculateButton">Calcola tariffa</button>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div id="result"></div>
+        </div>
+        <div id="datiPersonali" class="hidden">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="nome">Nome:</label>
+                        <input type="text" class="form-control" name="nome" id="nome" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="cognome">Cognome:</label>
+                        <input type="text" class="form-control" name="cognome" id="cognome" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="indirizzo">Indirizzo:</label>
+                        <input type="text" class="form-control" name="indirizzo" id="indirizzo" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="telefono">Cellulare:</label>
+                        <input type="text" class="form-control" name="telefono" id="telefono" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" class="form-control" name="email" id="email" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="data_nascita">Data di nascita:</label>
+                        <input type="date" class="form-control" name="data_nascita" id="data_nascita" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <button type="button" class="btn btn-success" id="submitButton">Invia richiesta</button>
+                </div>
+            </div>
+        </div>
+        <div id="requestResult"></div>
     </form>
-    <div id="result"></div>
-    <div id="requestResult"></div>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -328,6 +300,11 @@ function shipping_calculator_shortcode() {
         var destinazioneSelect = document.getElementById('destinazione');
         var partenzaSelect = document.getElementById('partenza');
         var tipoPalletSelect = document.getElementById('tipo_pallet');
+        var opzioniAggiuntiveSelect = document.getElementById('opzioni_aggiuntive');
+        var calculateButton = document.getElementById('calculateButton');
+        var submitButton = document.getElementById('submitButton');
+        var datiPersonaliDiv = document.getElementById('datiPersonali');
+        var requestResult = document.getElementById('requestResult');
 
         function updatePalletTypes() {
             var tipoSpedizione = tipoSpedizioneSelect.value;
@@ -349,29 +326,70 @@ function shipping_calculator_shortcode() {
         // Inizializza i tipi di pallet alla prima esecuzione
         updatePalletTypes();
 
-        window.calculateShipping = function() {
+        calculateButton.addEventListener('click', function() {
             var partenza = partenzaSelect.value;
             var destinazione = destinazioneSelect.value;
             var tipoSpedizione = tipoSpedizioneSelect.value;
             var tipoPallet = tipoPalletSelect.value;
-            var spondaIdraulica = document.getElementById('sponda_idraulica').checked;
-            var tariffaBase = parseFloat(shippingData[destinazione][tipoSpedizione][tipoPallet]) || 0;
-            var costoSpedizione = tariffaBase;
-            if (spondaIdraulica) {
-                costoSpedizione += 50; // Aggiungi costo fisso
-                costoSpedizione *= 1.03; // Aggiungi il 3% del costo totale
-            }
-            if (partenza !== 'FI' && partenza !== 'PO') {
-                costoSpedizione *= 1.10; // Aggiungi il 10% per partenze non da FI o PO
-            }
-            document.getElementById('result').innerText = 'Il costo di spedizione è: €' + costoSpedizione.toFixed(2);
-        };
+            var opzioniAggiuntive = opzioniAggiuntiveSelect.value;
 
-        window.submitRequest = function() {
-            document.getElementById('spedizioneForm').style.display = 'none';
-            document.getElementById('result').style.display = 'none';
-            document.getElementById('requestResult').innerText = 'Richiesta inviata con successo';
-        };
+            // Chiamata AJAX per calcolare il costo della spedizione
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/wp-admin/admin-ajax.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    document.getElementById('result').innerText = 'Il costo di spedizione è: €' + xhr.responseText;
+                    datiPersonaliDiv.classList.remove('hidden');
+                }
+            };
+            xhr.send('action=calculate_shipping&partenza=' + partenza + '&destinazione=' + destinazione + '&tipoSpedizione=' + tipoSpedizione + '&tipoPallet=' + tipoPallet + '&opzioniAggiuntive=' + opzioniAggiuntive);
+        });
+
+        submitButton.addEventListener('click', function() {
+            var form = document.getElementById('spedizioneForm');
+            var valid = form.checkValidity();
+            if (!valid) {
+                alert('Per favore, compila tutti i campi obbligatori.');
+                return;
+            }
+
+            var nome = document.getElementById('nome').value;
+            var cognome = document.getElementById('cognome').value;
+            var indirizzo = document.getElementById('indirizzo').value;
+            var telefono = document.getElementById('telefono').value;
+            var email = document.getElementById('email').value;
+            var dataNascita = document.getElementById('data_nascita').value;
+
+            if (!validateEmail(email)) {
+                alert('Per favore, inserisci un indirizzo email valido.');
+                return;
+            }
+
+            var partenza = partenzaSelect.value;
+            var destinazione = destinazioneSelect.value;
+            var tipoSpedizione = tipoSpedizioneSelect.value;
+            var tipoPallet = tipoPalletSelect.value;
+            var opzioniAggiuntive = opzioniAggiuntiveSelect.value;
+            var costoSpedizione = document.getElementById('result').innerText.split('€')[1].trim();
+
+            // Chiamata AJAX per inviare la richiesta
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/wp-admin/admin-ajax.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    // Reindirizza alla stessa pagina con parametro di query success=1
+                    window.location.href = window.location.href.split('?')[0] + '?success=1';
+                }
+            };
+            xhr.send('action=submit_request&nome=' + nome + '&cognome=' + cognome + '&indirizzo=' + indirizzo + '&telefono=' + telefono + '&email=' + email + '&dataNascita=' + dataNascita + '&partenza=' + partenza + '&destinazione=' + destinazione + '&tipoSpedizione=' + tipoSpedizione + '&tipoPallet=' + tipoPallet + '&opzioniAggiuntive=' + opzioniAggiuntive + '&costoSpedizione=' + costoSpedizione);
+        });
+
+        function validateEmail(email) {
+            var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
     });
     </script>
     <?php
@@ -379,6 +397,115 @@ function shipping_calculator_shortcode() {
 }
 
 add_shortcode('shipping_calculator', 'shipping_calculator_shortcode');
+
+// Aggiungi azioni AJAX per calcolare il costo della spedizione
+add_action('wp_ajax_calculate_shipping', 'calculate_shipping');
+add_action('wp_ajax_nopriv_calculate_shipping', 'calculate_shipping');
+
+function calculate_shipping() {
+    // Recupera i dati inviati via AJAX
+    $partenza = $_POST['partenza'];
+    $destinazione = $_POST['destinazione'];
+    $tipoSpedizione = $_POST['tipoSpedizione'];
+    $tipoPallet = $_POST['tipoPallet'];
+    $opzioniAggiuntive = $_POST['opzioniAggiuntive'];
+
+    // Carica i dati dal file CSV
+    $csv_file_path = get_template_directory() . '/tariffe_consegna.csv';
+    $csv_file = fopen($csv_file_path, 'r');
+    $rates = [];
+    if ($csv_file !== false) {
+        $headers = fgetcsv($csv_file, 0, ';');
+        while (($data = fgetcsv($csv_file, 0, ';')) !== false) {
+            $provincia = $data[0];
+            $data = array_map(function($value) {
+                return str_replace(',', '.', $value); // Normalizza i valori numerici
+            }, $data);
+            // Prepara i sottovettori per express e standard
+            $express_rates = array_combine(array_slice($headers, 2, 7), array_slice($data, 2, 7));
+            $standard_rates = array_combine(array_slice($headers, 9, 7), array_slice($data, 9, 7));
+
+            // Memorizza le tariffe in un array multidimensionale sotto la chiave della provincia
+            $rates[$provincia] = [
+                'express' => $express_rates,
+                'standard' => $standard_rates
+            ];
+        }
+        fclose($csv_file);
+    }
+
+    // Calcola il costo della spedizione
+    $tariffaBase = floatval($rates[$destinazione][$tipoSpedizione][$tipoPallet]) ?? 0;
+    $costoSpedizione = $tariffaBase;
+    
+    if ($opzioniAggiuntive === 'sponda_idraulica') {
+        $costoSpedizione += 50; // Aggiungi costo fisso
+        $costoSpedizione *= 1.03; // Aggiungi il 3% del costo totale
+    }
+    if ($opzioniAggiuntive === 'assicurazione') {
+        $costoSpedizione += 20; // Aggiungi costo fisso
+        $costoSpedizione *= 1.02; // Aggiungi il 2% del costo totale
+    }
+    if ($opzioniAggiuntive === 'consegna_rapida') {
+        $costoSpedizione += 30; // Aggiungi costo fisso
+        $costoSpedizione *= 1.05; // Aggiungi il 5% del costo totale
+    }
+    if ($partenza !== 'FI' && $partenza !== 'PO') {
+        $costoSpedizione *= 1.10; // Aggiungi il 10% per partenze non da FI o PO
+    }
+
+    echo number_format($costoSpedizione, 2);
+    wp_die();
+}
+
+// Aggiungi azioni AJAX per inviare la richiesta
+add_action('wp_ajax_submit_request', 'submit_request');
+add_action('wp_ajax_nopriv_submit_request', 'submit_request');
+
+function submit_request() {
+    $nome = sanitize_text_field($_POST['nome']);
+    $cognome = sanitize_text_field($_POST['cognome']);
+    $indirizzo = sanitize_text_field($_POST['indirizzo']);
+    $telefono = sanitize_text_field($_POST['telefono']);
+    $email = sanitize_email($_POST['email']);
+    $dataNascita = sanitize_text_field($_POST['dataNascita']);
+    $partenza = sanitize_text_field($_POST['partenza']);
+    $destinazione = sanitize_text_field($_POST['destinazione']);
+    $tipoSpedizione = sanitize_text_field($_POST['tipoSpedizione']);
+    $tipoPallet = sanitize_text_field($_POST['tipoPallet']);
+    $opzioniAggiuntive = sanitize_text_field($_POST['opzioniAggiuntive']);
+    $costoSpedizione = sanitize_text_field($_POST['costoSpedizione']);
+
+    // Invia la email (puoi usare una libreria come PHPMailer per questo)
+    $to = $email;
+    $subject = 'Dettagli della Richiesta di Spedizione';
+    $body = "
+        Nome: $nome\n
+        Cognome: $cognome\n
+        Indirizzo: $indirizzo\n
+        Cellulare: $telefono\n
+        Email: $email\n
+        Data di Nascita: $dataNascita\n
+        Partenza: $partenza\n
+        Destinazione: $destinazione\n
+        Tipo di Spedizione: $tipoSpedizione\n
+        Tipo di Pallet: $tipoPallet\n
+        Opzioni aggiuntive: $opzioniAggiuntive\n
+        Costo di Spedizione: €$costoSpedizione\n
+    ";
+    $headers = ['Content-Type: text/plain; charset=UTF-8'];
+    wp_mail($to, $subject, $body, $headers);
+
+    echo 'Richiesta inviata con successo';
+    wp_die();
+}
+
+
+
+
+
+
+
 
 
 
