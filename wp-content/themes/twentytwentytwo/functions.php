@@ -156,6 +156,10 @@ function shipping_calculator_shortcode() {
                 'express' => $express_rates,
                 'standard' => $standard_rates
             ];
+
+            if (empty($pallet_types)) {
+                $pallet_types = array_keys($express_rates);
+            }
         }
         fclose($csv_file);
     } else {
@@ -228,14 +232,8 @@ function shipping_calculator_shortcode() {
                     <select name="tipo_pallet" class="form-control" id="tipo_pallet" data-calc="true" required>
                         <?php
                         // Popola le opzioni del tipo di pallet in base ai dati caricati
-                        foreach ($rates as $province => $methods) {
-                            foreach ($methods as $pallets) {
-                                foreach ($pallets as $palletType) {
-                                    echo "<option value='$palletType'>$palletType</option>";
-                                }
-                                // Una volta popolate le opzioni per un metodo, non è necessario ripeterle
-                                break 2;
-                            }
+                        foreach ($pallet_types as $palletType) {
+                            echo "<option value='$palletType'>$palletType</option>";
                         }
                         ?>
                     </select>
