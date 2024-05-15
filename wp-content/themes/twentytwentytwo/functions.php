@@ -82,7 +82,7 @@ function add_bootstrap_to_wp() {
 }
 add_action('wp_enqueue_scripts', 'add_bootstrap_to_wp');
 
-/***************************solo lettura del file csv per vedere se lo leggeva*********************************/
+/***************************solo lettura del file csv per test*********************************/
 // // Funzione per leggere e visualizzare il CSV come tabella HTML
 // function shipping_calculator_shortcode($atts) {
 //     ob_start(); // Avvia la memorizzazione dell'output
@@ -244,7 +244,9 @@ function submit_request() {
 
 function shipping_calculator_enqueue_scripts() {
     wp_enqueue_style('shipping-calculator-css', get_template_directory_uri() . '/shipping-calculator.css');
+    wp_enqueue_style('select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css');
     wp_enqueue_script('shipping-calculator-js', get_template_directory_uri() . '/shipping-calculator.js', [], false, true);
+    wp_enqueue_script('select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js', ['jquery'], false, true);
 }
 add_action('wp_enqueue_scripts', 'shipping_calculator_enqueue_scripts');
 

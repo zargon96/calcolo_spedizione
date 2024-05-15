@@ -1,96 +1,108 @@
-document.addEventListener('DOMContentLoaded', function() {
-    var tipoSpedizioneSelect = document.getElementById('tipo_spedizione');
-    var destinazioneSelect = document.getElementById('destinazione');
-    var partenzaSelect = document.getElementById('partenza');
-    var tipoPalletSelect = document.getElementById('tipo_pallet');
-    var opzioniAggiuntiveSelect = document.getElementById('opzioni_aggiuntive');
-    var calculateButton = document.getElementById('calculateButton');
-    var submitButton = document.getElementById('submitButton');
-    var datiPersonaliDiv = document.getElementById('datiPersonali');
-    var requestResult = document.getElementById('requestResult');
+jQuery(document).ready(function($) {
+    var tipoSpedizioneSelect = $('#tipo_spedizione');
+    var destinazioneSelect = $('#destinazione');
+    var partenzaSelect = $('#partenza');
+    var tipoPalletSelect = $('#tipo_pallet');
+    var opzioniAggiuntiveSelect = $('#opzioni_aggiuntive');
+    var calculateButton = $('#calculateButton');
+    var submitButton = $('#submitButton');
+    var datiPersonaliDiv = $('#datiPersonali');
+
+    // Initialize Select2 with tagging
+    $('.js-example-tags').select2({
+        tags: true
+    });
 
     function updatePalletTypes() {
-        var tipoSpedizione = tipoSpedizioneSelect.value;
-        var destinazione = destinazioneSelect.value;
-        tipoPalletSelect.innerHTML = '';
+        var tipoSpedizione = tipoSpedizioneSelect.val();
+        var destinazione = destinazioneSelect.val();
+        tipoPalletSelect.empty();
         var options = shippingData[destinazione][tipoSpedizione];
-        Object.keys(options).forEach(function (palletType) {
-            var option = document.createElement('option');
-            option.value = palletType;
-            option.textContent = palletType;
-            tipoPalletSelect.appendChild(option);
+        $.each(options, function(palletType) {
+            tipoPalletSelect.append($('<option>', {
+                value: palletType,
+                text: palletType
+            }));
         });
     }
 
-    tipoSpedizioneSelect.addEventListener('change', updatePalletTypes);
-    destinazioneSelect.addEventListener('change', updatePalletTypes);
-    partenzaSelect.addEventListener('change', updatePalletTypes);
+    tipoSpedizioneSelect.change(updatePalletTypes);
+    destinazioneSelect.change(updatePalletTypes);
+    partenzaSelect.change(updatePalletTypes);
 
     // Inizializza i tipi di pallet alla prima esecuzione
     updatePalletTypes();
 
-    calculateButton.addEventListener('click', function() {
-        var partenza = partenzaSelect.value;
-        var destinazione = destinazioneSelect.value;
-        var tipoSpedizione = tipoSpedizioneSelect.value;
-        var tipoPallet = tipoPalletSelect.value;
-        var opzioniAggiuntive = opzioniAggiuntiveSelect.value;
+    calculateButton.click(function() {
+        var partenza = partenzaSelect.val();
+        var destinazione = destinazioneSelect.val();
+        var tipoSpedizione = tipoSpedizioneSelect.val();
+        var tipoPallet = tipoPalletSelect.val();
+        var opzioniAggiuntive = opzioniAggiuntiveSelect.val();
 
         // Chiamata AJAX per calcolare il costo della spedizione
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/wp-admin/admin-ajax.php', true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                document.getElementById('result').innerText = 'Il costo di spedizione è: €' + xhr.responseText;
-                datiPersonaliDiv.classList.remove('hidden');
-            } else {
-                alert('Errore nel calcolo del costo di spedizione!');
-            }
-        };
-        xhr.send('action=calculate_shipping&partenza=' + partenza + '&destinazione=' + destinazione + '&tipoSpedizione=' + tipoSpedizione + '&tipoPallet=' + tipoPallet + '&opzioniAggiuntive=' + opzioniAggiuntive);
+        $.post('/wp-admin/admin-ajax.php', {
+            action: 'calculate_shipping',
+            partenza: partenza,
+            destinazione: destinazione,
+            tipoSpedizione: tipoSpedizione,
+            tipoPallet: tipoPallet,
+            opzioniAggiuntive: opzioniAggiuntive
+        }, function(response) {
+            $('#result').text('Il costo di spedizione è: €' + response);
+            datiPersonaliDiv.removeClass('hidden');
+        }).fail(function() {
+            alert('Errore nel calcolo del costo di spedizione!');
+        });
     });
 
-    submitButton.addEventListener('click', function() {
-        var form = document.getElementById('spedizioneForm');
-        var valid = form.checkValidity();
-        if (!valid) {
+    submitButton.click(function() {
+        var form = $('#spedizioneForm')[0];
+        if (!form.checkValidity()) {
             alert('Per favore, compila tutti i campi obbligatori.');
             return;
         }
 
-        var nome = document.getElementById('nome').value;
-        var cognome = document.getElementById('cognome').value;
-        var indirizzo = document.getElementById('indirizzo').value;
-        var telefono = document.getElementById('telefono').value;
-        var email = document.getElementById('email').value;
-        var dataNascita = document.getElementById('data_nascita').value;
+        var nome = $('#nome').val();
+        var cognome = $('#cognome').val();
+        var indirizzo = $('#indirizzo').val();
+        var telefono = $('#telefono').val();
+        var email = $('#email').val();
+        var dataNascita = $('#data_nascita').val();
 
         if (!validateEmail(email)) {
             alert('Per favore, inserisci un indirizzo email valido.');
             return;
         }
 
-        var partenza = partenzaSelect.value;
-        var destinazione = destinazioneSelect.value;
-        var tipoSpedizione = tipoSpedizioneSelect.value;
-        var tipoPallet = tipoPalletSelect.value;
-        var opzioniAggiuntive = opzioniAggiuntiveSelect.value;
-        var costoSpedizione = document.getElementById('result').innerText.split('€')[1].trim();
+        var partenza = partenzaSelect.val();
+        var destinazione = destinazioneSelect.val();
+        var tipoSpedizione = tipoSpedizioneSelect.val();
+        var tipoPallet = tipoPalletSelect.val();
+        var opzioniAggiuntive = opzioniAggiuntiveSelect.val();
+        var costoSpedizione = $('#result').text().split('€')[1].trim();
 
         // Chiamata AJAX per inviare la richiesta
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/wp-admin/admin-ajax.php', true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                // Reindirizza alla stessa pagina con parametro di query success=1
-                window.location.href = window.location.href.split('?')[0] + '?success=1';
-            } else {
-                alert('Errore nell" invio della richiesta!');
-            }
-        };
-        xhr.send('action=submit_request&nome=' + nome + '&cognome=' + cognome + '&indirizzo=' + indirizzo + '&telefono=' + telefono + '&email=' + email + '&dataNascita=' + dataNascita + '&partenza=' + partenza + '&destinazione=' + destinazione + '&tipoSpedizione=' + tipoSpedizione + '&tipoPallet=' + tipoPallet + '&opzioniAggiuntive=' + opzioniAggiuntive + '&costoSpedizione=' + costoSpedizione);
+        $.post('/wp-admin/admin-ajax.php', {
+            action: 'submit_request',
+            nome: nome,
+            cognome: cognome,
+            indirizzo: indirizzo,
+            telefono: telefono,
+            email: email,
+            dataNascita: dataNascita,
+            partenza: partenza,
+            destinazione: destinazione,
+            tipoSpedizione: tipoSpedizione,
+            tipoPallet: tipoPallet,
+            opzioniAggiuntive: opzioniAggiuntive,
+            costoSpedizione: costoSpedizione
+        }, function(response) {
+            // Reindirizza alla stessa pagina con parametro di query success=1
+            window.location.href = window.location.href.split('?')[0] + '?success=1';
+        }).fail(function() {
+            alert('Errore nell" invio della richiesta!');
+        });
     });
 
     function validateEmail(email) {

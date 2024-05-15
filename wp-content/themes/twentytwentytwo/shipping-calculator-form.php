@@ -44,7 +44,7 @@ echo "<script>var shippingData = $json_data;</script>";
         <div class="col-md-6">
             <div class="form-group">
                 <label for="partenza">Partenza:</label>
-                <select name="partenza" class="form-control" id="partenza" data-calc="true" required>
+                <select name="partenza" class="form-control js-example-tags" id="partenza" data-calc="true" required>
                     <?php foreach ($provinces as $province) {
                         echo "<option value='$province'>$province</option>";
                     } ?>
@@ -54,7 +54,7 @@ echo "<script>var shippingData = $json_data;</script>";
         <div class="col-md-6">
             <div class="form-group">
                 <label for="destinazione">Destinazione:</label>
-                <select name="destinazione" class="form-control" id="destinazione" data-calc="true" required>
+                <select name="destinazione" class="form-control js-example-tags" id="destinazione" data-calc="true" required>
                     <?php foreach ($provinces as $province) {
                         echo "<option value='$province'>$province</option>";
                     } ?>
@@ -147,3 +147,4 @@ echo "<script>var shippingData = $json_data;</script>";
     </div>
     <div id="requestResult"></div>
 </form>
+
