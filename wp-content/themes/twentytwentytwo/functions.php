@@ -237,8 +237,7 @@ function submit_request() {
     ";
     $headers = ['Content-Type: text/plain; charset=UTF-8'];
     wp_mail($to, $subject, $body, $headers);
-
-    echo 'Richiesta inviata con successo';
+    
     wp_die();
 }
 

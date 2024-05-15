@@ -10,7 +10,7 @@ jQuery(document).ready(function($) {
 
     // Initialize Select2 with tagging
     $('.js-example-tags').select2({
-        tags: true
+        tags: true,
     });
 
     function updatePalletTypes() {
