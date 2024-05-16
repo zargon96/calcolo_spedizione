@@ -94,54 +94,132 @@ echo "<script>var shippingData = $json_data;</script>";
                 </select>
             </div>
         </div>
-        <div class="col-md-12">
+        <div class="col-md-12 text-right">
             <button type="button" class="btn btn-primary" id="calculateButton">Calcola tariffa</button>
         </div>
-    </div>
+    
     
     <div class="col-md-12">
         <div id="result"></div>
     </div>
+    <div class="col-md-12 mt-3 text-right">
+        <button type="button" class="btn btn-primary" id="nextbutton" style="display: none;">avanti</button>
+    </div>
+    </div>
+</form>
+
+<form class="container">
     <div id="datiPersonali" class="hidden">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="nome">Nome:</label>
-                    <input type="text" class="form-control" name="nome" id="nome" required>
+    <div class="row">
+            <!-- Form Dati Anagrafici -->
+            <div class="col-sm-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Dati Personali</h5>
+                        <form>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="nome">Nome:</label>
+                                        <input type="text" class="form-control" name="nome" id="nome" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="cognome">Cognome:</label>
+                                        <input type="text" class="form-control" name="cognome" id="cognome" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="indirizzo">Indirizzo:</label>
+                                        <input type="text" class="form-control" name="indirizzo" id="indirizzo" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="citta">Città:</label>
+                                        <input type="text" class="form-control" name="citta" id="citta" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="cap">CAP:</label>
+                                        <input type="text" class="form-control" name="cap" id="cap" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="telefono">Cellulare:</label>
+                                        <input type="text" class="form-control" name="telefono" id="telefono" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="email">Email:</label>
+                                        <input type="email" class="form-control" name="email" id="email" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="data_nascita">Data di nascita:</label>
+                                        <input type="date" class="form-control" name="data_nascita" id="data_nascita" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="mt-3 text-right">
+                    <button type="button" class="btn btn-success" id="submitButton">Invia richiesta</button>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="cognome">Cognome:</label>
-                    <input type="text" class="form-control" name="cognome" id="cognome" required>
+
+            <!-- Riepilogo Spedizione -->
+            <div class="col-sm-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Riepilogo Spedizione</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <strong>Partenza:</strong>
+                                    <p class="card-text" id="summaryPartenza"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <strong>Destinazione:</strong>
+                                    <p class="card-text" id="summaryDestinazione"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <strong>Tipo di Spedizione:</strong>
+                                    <p class="card-text" id="summaryTipoSpedizione"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <strong>Tipo di Pallet:</strong>
+                                    <p class="card-text" id="summaryTipoPallet"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <strong>Opzioni Aggiuntive:</strong>
+                                    <p class="card-text" id="summaryOpzioni"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <strong>Costo Totale:</strong>
+                                    <p class="card-text" id="summaryCosto"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="indirizzo">Indirizzo:</label>
-                    <input type="text" class="form-control" name="indirizzo" id="indirizzo" required>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="telefono">Cellulare:</label>
-                    <input type="text" class="form-control" name="telefono" id="telefono" required>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" class="form-control" name="email" id="email" required>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="data_nascita">Data di nascita:</label>
-                    <input type="date" class="form-control" name="data_nascita" id="data_nascita" required>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <button type="button" class="btn btn-success" id="submitButton">Invia richiesta</button>
             </div>
         </div>
     </div>

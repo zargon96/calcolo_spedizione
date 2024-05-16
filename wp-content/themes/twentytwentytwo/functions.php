@@ -208,6 +208,8 @@ function submit_request() {
     $nome = sanitize_text_field($_POST['nome']);
     $cognome = sanitize_text_field($_POST['cognome']);
     $indirizzo = sanitize_text_field($_POST['indirizzo']);
+    $citta = sanitize_text_field($_POST['citta']);
+    $cap = sanitize_text_field($_POST['cap']);
     $telefono = sanitize_text_field($_POST['telefono']);
     $email = sanitize_email($_POST['email']);
     $dataNascita = sanitize_text_field($_POST['dataNascita']);
@@ -225,6 +227,8 @@ function submit_request() {
         Nome: $nome\n
         Cognome: $cognome\n
         Indirizzo: $indirizzo\n
+        citta: $citta\n
+        cap: $cap\n
         Cellulare: $telefono\n
         Email: $email\n
         Data di Nascita: $dataNascita\n

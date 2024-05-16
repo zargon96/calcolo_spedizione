@@ -7,6 +7,7 @@ jQuery(document).ready(function($) {
     var calculateButton = $('#calculateButton');
     var submitButton = $('#submitButton');
     var datiPersonaliDiv = $('#datiPersonali');
+    var nextbutton = $('#nextbutton');
 
     // Initialize Select2 with tagging
     $('.js-example-tags').select2({
@@ -50,10 +51,22 @@ jQuery(document).ready(function($) {
             opzioniAggiuntive: opzioniAggiuntive
         }, function(response) {
             $('#result').text('Il costo di spedizione è: €' + response);
-            datiPersonaliDiv.removeClass('hidden');
+            $('#summaryPartenza').text(partenza);
+            $('#summaryDestinazione').text(destinazione);
+            $('#summaryTipoSpedizione').text(tipoSpedizione);
+            $('#summaryTipoPallet').text(tipoPallet);
+            $('#summaryOpzioni').text(opzioniAggiuntive || 'Nessuna');
+            $('#summaryCosto').text('€' + response);
+            $('#summary').removeClass('hidden'); // Mostra il riepilogo
+            $('#nextbutton').show();
         }).fail(function() {
             alert('Errore nel calcolo del costo di spedizione!');
         });
+    });
+
+    nextbutton.click(function() {
+        $('#spedizioneForm').hide();
+        datiPersonaliDiv.show(); // Mostra i campi dei dati anagrafici
     });
 
     submitButton.click(function() {
@@ -66,6 +79,8 @@ jQuery(document).ready(function($) {
         var nome = $('#nome').val();
         var cognome = $('#cognome').val();
         var indirizzo = $('#indirizzo').val();
+        var citta = $('#citta').val();
+        var cap = $('#cap').val();
         var telefono = $('#telefono').val();
         var email = $('#email').val();
         var dataNascita = $('#data_nascita').val();
@@ -88,6 +103,8 @@ jQuery(document).ready(function($) {
             nome: nome,
             cognome: cognome,
             indirizzo: indirizzo,
+            citta: citta,
+            cap: cap,
             telefono: telefono,
             email: email,
             dataNascita: dataNascita,
