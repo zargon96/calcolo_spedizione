@@ -220,7 +220,7 @@ function submit_request() {
     $opzioniAggiuntive = sanitize_text_field($_POST['opzioniAggiuntive']);
     $costoSpedizione = sanitize_text_field($_POST['costoSpedizione']);
 
-    // Invia l' email (libreria PHPMailer)
+    // Invia l' email
     $to = $email;
     $subject = 'Dettagli della Richiesta di Spedizione';
     $body = "
