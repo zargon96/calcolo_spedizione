@@ -15,7 +15,7 @@ define('SHIPPING_CALCULATOR_VERSION', '1.0');
 define('SHIPPING_CALCULATOR_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
 // Includi i file necessari
-include_once SHIPPING_CALCULATOR_PLUGIN_DIR . 'includes/shipping-calculator-form.php';
+include_once SHIPPING_CALCULATOR_PLUGIN_DIR . 'shipping-calculator-form.php';
 
 // Carica gli script e gli stili necessari
 function shipping_calculator_enqueue_scripts() {
@@ -54,14 +54,12 @@ add_action('wp_ajax_calculate_shipping', 'calculate_shipping');
 add_action('wp_ajax_nopriv_calculate_shipping', 'calculate_shipping');
 
 function calculate_shipping() {
-    // Recupera i dati inviati via AJAX
     $partenza = sanitize_text_field($_POST['partenza']);
     $destinazione = sanitize_text_field($_POST['destinazione']);
     $tipoSpedizione = sanitize_text_field($_POST['tipoSpedizione']);
     $tipoPallet = sanitize_text_field($_POST['tipoPallet']);
     $opzioniAggiuntive = sanitize_text_field($_POST['opzioniAggiuntive']);
 
-    // Carica i dati dal file CSV
     $csv_file_path = plugin_dir_path(__FILE__) . 'tariffe_consegna.csv';
     $csv_file = fopen($csv_file_path, 'r');
     $rates = [];
@@ -70,13 +68,11 @@ function calculate_shipping() {
         while (($data = fgetcsv($csv_file, 0, ';')) !== false) {
             $provincia = $data[0];
             $data = array_map(function($value) {
-                return str_replace(',', '.', $value); // Normalizza i valori numerici
+                return str_replace(',', '.', $value);
             }, $data);
-            // Prepara i sottovettori per express e standard
             $express_rates = array_combine(array_slice($headers, 2, 7), array_slice($data, 2, 7));
             $standard_rates = array_combine(array_slice($headers, 9, 7), array_slice($data, 9, 7));
 
-            // Memorizza le tariffe in un array multidimensionale sotto la chiave della provincia
             $rates[$provincia] = [
                 'express' => $express_rates,
                 'standard' => $standard_rates
@@ -85,29 +81,29 @@ function calculate_shipping() {
         fclose($csv_file);
     }
 
-    // Calcola il costo della spedizione
     $tariffaBase = floatval($rates[$destinazione][$tipoSpedizione][$tipoPallet]) ?? 0;
     $costoSpedizione = $tariffaBase;
     
     if ($opzioniAggiuntive === 'sponda_idraulica') {
-        $costoSpedizione += 50; // Aggiungi costo fisso
-        $costoSpedizione *= 1.03; // Aggiungi il 3% del costo totale
+        $costoSpedizione += 50;
+        $costoSpedizione *= 1.03;
     }
     if ($opzioniAggiuntive === 'assicurazione') {
-        $costoSpedizione += 20; // Aggiungi costo fisso
-        $costoSpedizione *= 1.02; // Aggiungi il 2% del costo totale
+        $costoSpedizione += 20;
+        $costoSpedizione *= 1.02;
     }
     if ($opzioniAggiuntive === 'consegna_rapida') {
-        $costoSpedizione += 30; // Aggiungi costo fisso
-        $costoSpedizione *= 1.05; // Aggiungi il 5% del costo totale
+        $costoSpedizione += 30;
+        $costoSpedizione *= 1.05;
     }
     if ($partenza !== 'FI' && $partenza !== 'PO') {
-        $costoSpedizione *= 1.10; // Aggiungi il 10% per partenze non da FI o PO
+        $costoSpedizione *= 1.10;
     }
 
     echo number_format($costoSpedizione, 2);
     wp_die();
 }
+
 
 // Aggiungi azioni AJAX per inviare la richiesta
 add_action('wp_ajax_submit_request', 'submit_request');
