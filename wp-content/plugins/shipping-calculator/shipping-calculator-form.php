@@ -1,6 +1,6 @@
 <?php
 // Definisce il percorso al file CSV
-$csv_file_path = get_template_directory() . '/shipping-calculator/tariffe_consegna.csv';
+$csv_file_path = plugin_dir_path(__FILE__) . 'tariffe_consegna.csv';
 
 // Apre il file CSV e legge i dati
 $csv_file = fopen($csv_file_path, 'r');

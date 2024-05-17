@@ -17,16 +17,18 @@ define('SHIPPING_CALCULATOR_PLUGIN_DIR', plugin_dir_path(__FILE__));
 // Includi i file necessari
 include_once SHIPPING_CALCULATOR_PLUGIN_DIR . 'includes/shipping-calculator-form.php';
 
-add_action('wp_enqueue_scripts', 'shipping_calculator_enqueue_scripts');
+// Carica gli script e gli stili necessari
 function shipping_calculator_enqueue_scripts() {
     wp_enqueue_style('bootstrap-css', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css', array(), '4.5.2');
     wp_enqueue_style('shipping-calculator-css', plugins_url('shipping-calculator.css', __FILE__));
     wp_enqueue_script('bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js', array('jquery'), '4.5.2', true);
     wp_enqueue_script('shipping-calculator-js', plugins_url('shipping-calculator.js', __FILE__), array('jquery'), null, true);
     wp_enqueue_style('select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css');
-    wp_enqueue_script('select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js', ['jquery'], false, true);
+    wp_enqueue_script('select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js', array('jquery'), false, true);
 }
+add_action('wp_enqueue_scripts', 'shipping_calculator_enqueue_scripts');
 
+// Definisci lo shortcode del calcolatore di spedizione
 function shipping_calculator_shortcode() {
     ob_start(); // Inizia a memorizzare l'output
 
@@ -45,7 +47,6 @@ function shipping_calculator_shortcode() {
 
     return ob_get_clean(); // Restituisce e pulisce il buffer di output
 }
-
 add_shortcode('shipping_calculator', 'shipping_calculator_shortcode');
 
 // Aggiungi azioni AJAX per calcolare il costo della spedizione
@@ -54,14 +55,14 @@ add_action('wp_ajax_nopriv_calculate_shipping', 'calculate_shipping');
 
 function calculate_shipping() {
     // Recupera i dati inviati via AJAX
-    $partenza = $_POST['partenza'];
-    $destinazione = $_POST['destinazione'];
-    $tipoSpedizione = $_POST['tipoSpedizione'];
-    $tipoPallet = $_POST['tipoPallet'];
-    $opzioniAggiuntive = $_POST['opzioniAggiuntive'];
+    $partenza = sanitize_text_field($_POST['partenza']);
+    $destinazione = sanitize_text_field($_POST['destinazione']);
+    $tipoSpedizione = sanitize_text_field($_POST['tipoSpedizione']);
+    $tipoPallet = sanitize_text_field($_POST['tipoPallet']);
+    $opzioniAggiuntive = sanitize_text_field($_POST['opzioniAggiuntive']);
 
     // Carica i dati dal file CSV
-    $csv_file_path = get_template_directory() . '/shipping-calculator/tariffe_consegna.csv';
+    $csv_file_path = plugin_dir_path(__FILE__) . 'tariffe_consegna.csv';
     $csv_file = fopen($csv_file_path, 'r');
     $rates = [];
     if ($csv_file !== false) {
@@ -165,4 +166,6 @@ function submit_request() {
     
     wp_die();
 }
+
+
 
