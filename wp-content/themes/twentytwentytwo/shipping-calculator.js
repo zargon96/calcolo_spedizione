@@ -55,7 +55,7 @@ jQuery(document).ready(function($) {
             $('#summaryDestinazione').text(destinazione);
             $('#summaryTipoSpedizione').text(tipoSpedizione);
             $('#summaryTipoPallet').text(tipoPallet);
-            $('#summaryOpzioni').text(opzioniAggiuntive || 'Nessuna');
+            $('#summaryOpzioni').text(opzioniAggiuntive);
             $('#summaryCosto').text('€' + response);
             $('#summary').removeClass('hidden'); // Mostra il riepilogo
             $('#nextbutton').show();
@@ -76,38 +76,47 @@ jQuery(document).ready(function($) {
             return;
         }
 
-        var nome = $('#nome').val();
-        var cognome = $('#cognome').val();
-        var indirizzo = $('#indirizzo').val();
-        var citta = $('#citta').val();
-        var cap = $('#cap').val();
-        var telefono = $('#telefono').val();
-        var email = $('#email').val();
-        var dataNascita = $('#data_nascita').val();
+        var nomeMittente = $('#nome_mittente').val();
+        var indirizzoMittente = $('#indirizzo_mittente').val();
+        var cittaMittente = $('#citta_mittente').val();
+        var capMittente = $('#cap_mittente').val();
+        var telefonoMittente = $('#telefono_mittente').val();
+        var emailMittente = $('#email_mittente').val();
 
-        if (!validateEmail(email)) {
+        var nomeDestinatario = $('#nome_destinatario').val();
+        var indirizzoDestinatario = $('#indirizzo_destinatario').val();
+        var cittaDestinatario = $('#citta_destinatario').val();
+        var capDestinatario = $('#cap_destinatario').val();
+        var telefonoDestinatario = $('#telefono_destinatario').val();
+        var emailDestinatario = $('#email_destinatario').val();
+
+        if (!validateEmail(emailMittente) || !validateEmail(emailDestinatario)) {
             alert('Per favore, inserisci un indirizzo email valido.');
             return;
         }
 
-        var partenza = partenzaSelect.val();
-        var destinazione = destinazioneSelect.val();
-        var tipoSpedizione = tipoSpedizioneSelect.val();
-        var tipoPallet = tipoPalletSelect.val();
-        var opzioniAggiuntive = opzioniAggiuntiveSelect.val();
+        var partenza = $('#partenza').val();
+        var destinazione = $('#destinazione').val();
+        var tipoSpedizione = $('#tipo_spedizione').val();
+        var tipoPallet = $('#tipo_pallet').val();
+        var opzioniAggiuntive = $('#opzioni_aggiuntive').val();
         var costoSpedizione = $('#result').text().split('€')[1].trim();
 
         // Chiamata AJAX per inviare la richiesta
         $.post('/wp-admin/admin-ajax.php', {
             action: 'submit_request',
-            nome: nome,
-            cognome: cognome,
-            indirizzo: indirizzo,
-            citta: citta,
-            cap: cap,
-            telefono: telefono,
-            email: email,
-            dataNascita: dataNascita,
+            nome_mittente: nomeMittente,
+            indirizzo_mittente: indirizzoMittente,
+            citta_mittente: cittaMittente,
+            cap_mittente: capMittente,
+            telefono_mittente: telefonoMittente,
+            email_mittente: emailMittente,
+            nome_destinatario: nomeDestinatario,
+            indirizzo_destinatario: indirizzoDestinatario,
+            citta_destinatario: cittaDestinatario,
+            cap_destinatario: capDestinatario,
+            telefono_destinatario: telefonoDestinatario,
+            email_destinatario: emailDestinatario,
             partenza: partenza,
             destinazione: destinazione,
             tipoSpedizione: tipoSpedizione,
@@ -118,7 +127,7 @@ jQuery(document).ready(function($) {
             // Reindirizza alla stessa pagina con parametro di query success=1
             window.location.href = window.location.href.split('?')[0] + '?success=1';
         }).fail(function() {
-            alert('Errore nell" invio della richiesta!');
+            alert('Errore nell\'invio della richiesta!');
         });
     });
 

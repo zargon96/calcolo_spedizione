@@ -205,14 +205,20 @@ add_action('wp_ajax_submit_request', 'submit_request');
 add_action('wp_ajax_nopriv_submit_request', 'submit_request');
 
 function submit_request() {
-    $nome = sanitize_text_field($_POST['nome']);
-    $cognome = sanitize_text_field($_POST['cognome']);
-    $indirizzo = sanitize_text_field($_POST['indirizzo']);
-    $citta = sanitize_text_field($_POST['citta']);
-    $cap = sanitize_text_field($_POST['cap']);
-    $telefono = sanitize_text_field($_POST['telefono']);
-    $email = sanitize_email($_POST['email']);
-    $dataNascita = sanitize_text_field($_POST['dataNascita']);
+    $nome_mittente = sanitize_text_field($_POST['nome_mittente']);
+    $indirizzo_mittente = sanitize_text_field($_POST['indirizzo_mittente']);
+    $citta_mittente = sanitize_text_field($_POST['citta_mittente']);
+    $cap_mittente = sanitize_text_field($_POST['cap_mittente']);
+    $telefono_mittente = sanitize_text_field($_POST['telefono_mittente']);
+    $email_mittente = sanitize_email($_POST['email_mittente']);
+    
+    $nome_destinatario = sanitize_text_field($_POST['nome_destinatario']);
+    $indirizzo_destinatario = sanitize_text_field($_POST['indirizzo_destinatario']);
+    $citta_destinatario = sanitize_text_field($_POST['citta_destinatario']);
+    $cap_destinatario = sanitize_text_field($_POST['cap_destinatario']);
+    $telefono_destinatario = sanitize_text_field($_POST['telefono_destinatario']);
+    $email_destinatario = sanitize_email($_POST['email_destinatario']);
+    
     $partenza = sanitize_text_field($_POST['partenza']);
     $destinazione = sanitize_text_field($_POST['destinazione']);
     $tipoSpedizione = sanitize_text_field($_POST['tipoSpedizione']);
@@ -220,18 +226,25 @@ function submit_request() {
     $opzioniAggiuntive = sanitize_text_field($_POST['opzioniAggiuntive']);
     $costoSpedizione = sanitize_text_field($_POST['costoSpedizione']);
 
-    // Invia l' email
-    $to = $email;
+    // Invia l'email
+    $to = $email_mittente; // Puoi cambiare questo indirizzo email con quello del destinatario se preferisci
     $subject = 'Dettagli della Richiesta di Spedizione';
     $body = "
-        Nome: $nome\n
-        Cognome: $cognome\n
-        Indirizzo: $indirizzo\n
-        citta: $citta\n
-        cap: $cap\n
-        Cellulare: $telefono\n
-        Email: $email\n
-        Data di Nascita: $dataNascita\n
+        Mittente:\n
+        Nominativo Mittente: $nome_mittente\n
+        Indirizzo Mittente: $indirizzo_mittente\n
+        Città Mittente: $citta_mittente\n
+        CAP Mittente: $cap_mittente\n
+        Cellulare Mittente: $telefono_mittente\n
+        Email Mittente: $email_mittente\n\n
+        Destinatario:\n
+        Nominativo Destinatario: $nome_destinatario\n
+        Indirizzo Destinatario: $indirizzo_destinatario\n
+        Città Destinatario: $citta_destinatario\n
+        CAP Destinatario: $cap_destinatario\n
+        Cellulare Destinatario: $telefono_destinatario\n
+        Email Destinatario: $email_destinatario\n\n
+        Riepilogo:\n
         Partenza: $partenza\n
         Destinazione: $destinazione\n
         Tipo di Spedizione: $tipoSpedizione\n
