@@ -2,6 +2,7 @@
 // Definisce il percorso al file CSV
 $csv_file_path = plugin_dir_path(__FILE__) . 'tariffe_consegna.csv';
 
+// Apre il file CSV e legge i dati
 $csv_file = fopen($csv_file_path, 'r');
 $rates = [];
 $provinces = [];
@@ -12,16 +13,19 @@ if ($csv_file !== false) {
         $provincia = $data[0];
         $provinces[$provincia] = $provincia;
         $data = array_map(function($value) {
-            return str_replace(',', '.', $value);
+            return str_replace(',', '.', $value); // Normalizza i valori numerici
         }, $data);
+        // Prepara i sottovettori per express e standard
         $express_rates = array_combine(array_slice($headers, 2, 7), array_slice($data, 2, 7));
         $standard_rates = array_combine(array_slice($headers, 9, 7), array_slice($data, 9, 7));
-        
+
+        // Memorizza le tariffe in un array multidimensionale sotto la chiave della provincia
         $rates[$provincia] = [
             'express' => $express_rates,
             'standard' => $standard_rates
         ];
-        
+
+        // Se pallet_types è vuoto, riempilo con i tipi di pallet del primo metodo di spedizione trovato
         if (empty($pallet_types)) {
             $pallet_types = array_keys($express_rates);
         }
@@ -33,9 +37,7 @@ if ($csv_file !== false) {
 
 $json_data = json_encode($rates);
 echo "<script>var shippingData = $json_data;</script>";
-
 ?>
-
 
 <form id="spedizioneForm" class="container">
     <div class="row">
@@ -260,3 +262,4 @@ echo "<script>var shippingData = $json_data;</script>";
     </div>
     <div id="requestResult"></div>
 </form>
+

@@ -8,6 +8,7 @@ jQuery(document).ready(function($) {
     var submitButton = $('#submitButton');
     var datiPersonaliDiv = $('#datiPersonali');
     var nextbutton = $('#nextbutton');
+    
 
     // Initialize Select2 with tagging
     $('.js-example-tags').select2({

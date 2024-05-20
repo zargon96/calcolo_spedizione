@@ -7,28 +7,9 @@ Author: Revool
 */
 
 if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly
+    exit;
 }
 
-// Definisci le costanti del plugin
-define('SHIPPING_CALCULATOR_VERSION', '1.0');
-define('SHIPPING_CALCULATOR_PLUGIN_DIR', plugin_dir_path(__FILE__));
-
-// Includi i file necessari
-include_once SHIPPING_CALCULATOR_PLUGIN_DIR . 'shipping-calculator-form.php';
-
-// Carica gli script e gli stili necessari
-function shipping_calculator_enqueue_scripts() {
-    wp_enqueue_style('bootstrap-css', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css', array(), '4.5.2');
-    wp_enqueue_style('shipping-calculator-css', plugins_url('shipping-calculator.css', __FILE__));
-    wp_enqueue_script('bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js', array('jquery'), '4.5.2', true);
-    wp_enqueue_script('shipping-calculator-js', plugins_url('shipping-calculator.js', __FILE__), array('jquery'), null, true);
-    wp_enqueue_style('select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css');
-    wp_enqueue_script('select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js', array('jquery'), false, true);
-}
-add_action('wp_enqueue_scripts', 'shipping_calculator_enqueue_scripts');
-
-// Definisci lo shortcode del calcolatore di spedizione
 function shipping_calculator_shortcode() {
     ob_start(); // Inizia a memorizzare l'output
 
@@ -47,6 +28,7 @@ function shipping_calculator_shortcode() {
 
     return ob_get_clean(); // Restituisce e pulisce il buffer di output
 }
+
 add_shortcode('shipping_calculator', 'shipping_calculator_shortcode');
 
 // Aggiungi azioni AJAX per calcolare il costo della spedizione
@@ -54,12 +36,14 @@ add_action('wp_ajax_calculate_shipping', 'calculate_shipping');
 add_action('wp_ajax_nopriv_calculate_shipping', 'calculate_shipping');
 
 function calculate_shipping() {
+    // Recupera i dati inviati via AJAX
     $partenza = sanitize_text_field($_POST['partenza']);
     $destinazione = sanitize_text_field($_POST['destinazione']);
     $tipoSpedizione = sanitize_text_field($_POST['tipoSpedizione']);
     $tipoPallet = sanitize_text_field($_POST['tipoPallet']);
     $opzioniAggiuntive = sanitize_text_field($_POST['opzioniAggiuntive']);
 
+    // Carica i dati dal file CSV
     $csv_file_path = plugin_dir_path(__FILE__) . 'tariffe_consegna.csv';
     $csv_file = fopen($csv_file_path, 'r');
     $rates = [];
@@ -68,11 +52,13 @@ function calculate_shipping() {
         while (($data = fgetcsv($csv_file, 0, ';')) !== false) {
             $provincia = $data[0];
             $data = array_map(function($value) {
-                return str_replace(',', '.', $value);
+                return str_replace(',', '.', $value); // Normalizza i valori numerici
             }, $data);
+            // Prepara i sottovettori per express e standard
             $express_rates = array_combine(array_slice($headers, 2, 7), array_slice($data, 2, 7));
             $standard_rates = array_combine(array_slice($headers, 9, 7), array_slice($data, 9, 7));
 
+            // Memorizza le tariffe in un array multidimensionale sotto la chiave della provincia
             $rates[$provincia] = [
                 'express' => $express_rates,
                 'standard' => $standard_rates
@@ -81,29 +67,29 @@ function calculate_shipping() {
         fclose($csv_file);
     }
 
+    // Calcola il costo della spedizione
     $tariffaBase = floatval($rates[$destinazione][$tipoSpedizione][$tipoPallet]) ?? 0;
     $costoSpedizione = $tariffaBase;
     
     if ($opzioniAggiuntive === 'sponda_idraulica') {
-        $costoSpedizione += 50;
-        $costoSpedizione *= 1.03;
+        $costoSpedizione += 50; // Aggiungi costo fisso
+        $costoSpedizione *= 1.03; // Aggiungi il 3% del costo totale
     }
     if ($opzioniAggiuntive === 'assicurazione') {
-        $costoSpedizione += 20;
-        $costoSpedizione *= 1.02;
+        $costoSpedizione += 20; // Aggiungi costo fisso
+        $costoSpedizione *= 1.02; // Aggiungi il 2% del costo totale
     }
     if ($opzioniAggiuntive === 'consegna_rapida') {
-        $costoSpedizione += 30;
-        $costoSpedizione *= 1.05;
+        $costoSpedizione += 30; // Aggiungi costo fisso
+        $costoSpedizione *= 1.05; // Aggiungi il 5% del costo totale
     }
     if ($partenza !== 'FI' && $partenza !== 'PO') {
-        $costoSpedizione *= 1.10;
+        $costoSpedizione *= 1.10; // Aggiungi il 10% per partenze non da FI o PO
     }
 
     echo number_format($costoSpedizione, 2);
     wp_die();
 }
-
 
 // Aggiungi azioni AJAX per inviare la richiesta
 add_action('wp_ajax_submit_request', 'submit_request');
@@ -132,7 +118,7 @@ function submit_request() {
     $costoSpedizione = sanitize_text_field($_POST['costoSpedizione']);
 
     // Invia l'email
-    $to = $email_mittente;
+    $to = $email_mittente; // Puoi cambiare questo indirizzo email con quello del destinatario se preferisci
     $subject = 'Dettagli della Richiesta di Spedizione';
     $body = "
         Mittente:\n
@@ -162,6 +148,15 @@ function submit_request() {
     
     wp_die();
 }
+
+function shipping_calculator_enqueue_scripts() {
+    wp_enqueue_style('shipping-calculator-css', plugin_dir_url(__FILE__) . 'shipping-calculator.css');
+    wp_enqueue_style('select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css');
+    wp_enqueue_script('shipping-calculator-js', plugin_dir_url(__FILE__) . 'shipping-calculator.js', ['jquery'], null, true);
+    wp_enqueue_script('select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js', ['jquery'], null, true);
+}
+add_action('wp_enqueue_scripts', 'shipping_calculator_enqueue_scripts');
+
 
 
 
