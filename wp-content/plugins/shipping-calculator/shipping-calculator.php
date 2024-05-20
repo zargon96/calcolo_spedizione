@@ -31,7 +31,7 @@ function shipping_calculator_shortcode() {
 
 add_shortcode('shipping_calculator', 'shipping_calculator_shortcode');
 
-// Aggiungi azioni AJAX per calcolare il costo della spedizione
+// AJAX per calcolare il costo della spedizione
 add_action('wp_ajax_calculate_shipping', 'calculate_shipping');
 add_action('wp_ajax_nopriv_calculate_shipping', 'calculate_shipping');
 
@@ -91,7 +91,7 @@ function calculate_shipping() {
     wp_die();
 }
 
-// Aggiungi azioni AJAX per inviare la richiesta
+// AJAX per inviare la richiesta
 add_action('wp_ajax_submit_request', 'submit_request');
 add_action('wp_ajax_nopriv_submit_request', 'submit_request');
 
