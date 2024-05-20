@@ -8,7 +8,6 @@ jQuery(document).ready(function($) {
     var submitButton = $('#submitButton');
     var datiPersonaliDiv = $('#datiPersonali');
     var nextbutton = $('#nextbutton');
-    
 
     // Initialize Select2 with tagging
     $('.js-example-tags').select2({
@@ -91,11 +90,6 @@ jQuery(document).ready(function($) {
         var telefonoDestinatario = $('#telefono_destinatario').val();
         var emailDestinatario = $('#email_destinatario').val();
 
-        if (!validateEmail(emailMittente) || !validateEmail(emailDestinatario)) {
-            alert('Per favore, inserisci un indirizzo email valido.');
-            return;
-        }
-
         var partenza = $('#partenza').val();
         var destinazione = $('#destinazione').val();
         var tipoSpedizione = $('#tipo_spedizione').val();
@@ -125,15 +119,18 @@ jQuery(document).ready(function($) {
             opzioniAggiuntive: opzioniAggiuntive,
             costoSpedizione: costoSpedizione
         }, function(response) {
-            // Reindirizza alla stessa pagina con parametro di query success=1
-            window.location.href = window.location.href.split('?')[0] + '?success=1';
-        }).fail(function() {
-            alert('Errore nell\'invio della richiesta!');
-        });
+            if (response.success) {
+                // Mostra l'avviso di successo
+                $('#alertContainer').html('<div class="alert alert-success alert-dismissible fade show" role="alert">Richiesta inviata con successo.<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+                setTimeout(function() {
+                    window.location.href = window.location.href.split('?')[0] + '?success=1';
+                }, 2000);
+            } else {
+                // Mostra l'avviso di errore sopra e sotto il modulo
+                $('.alert').remove(); // Rimuovi eventuali avvisi esistenti
+                $('#alertContainer').prepend('<div class="alert alert-danger alert-dismissible fade show" role="alert">Errore: ' + response.data.errors.join(', ') + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');                
+            }
+        })
     });
-
-    function validateEmail(email) {
-        var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(email);
-    }
 });
+
