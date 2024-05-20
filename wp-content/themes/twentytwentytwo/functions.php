@@ -71,9 +71,6 @@ function add_bootstrap_to_wp() {
     // Bootstrap CSS
     wp_enqueue_style('bootstrap-css', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css', array(), '4.5.2');
 
-    // Custom CSS (if any)
-    wp_enqueue_style('custom-style', get_stylesheet_uri());
-
     // jQuery
     wp_enqueue_script('jquery');
 
