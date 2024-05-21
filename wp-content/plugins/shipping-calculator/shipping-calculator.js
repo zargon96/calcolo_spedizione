@@ -157,4 +157,24 @@ jQuery(document).ready(function($) {
     $('#telefono_mittente, #telefono_destinatario').on('input', function() {
         this.value = this.value.replace(/\D/g, '').substring(0, 10);
     });
+    // Funzioni di validazione
+    function validateField(field) {
+        if (field.checkValidity()) {
+            field.classList.remove('is-invalid');
+            field.classList.add('is-valid');
+        } else {
+            field.classList.remove('is-valid');
+            field.classList.add('is-invalid');
+        }
+    }
+
+    $('#nome_mittente, #indirizzo_mittente, #citta_mittente, #cap_mittente, #telefono_mittente, #email_mittente, #nome_destinatario, #indirizzo_destinatario, #citta_destinatario, #cap_destinatario, #telefono_destinatario, #email_destinatario').on('input', function() {
+        validateField(this);
+    });
+
+    submitButton.click(function() {
+        $('#nome_mittente, #indirizzo_mittente, #citta_mittente, #cap_mittente, #telefono_mittente, #email_mittente, #nome_destinatario, #indirizzo_destinatario, #citta_destinatario, #cap_destinatario, #telefono_destinatario, #email_destinatario').each(function() {
+            validateField(this);
+        });
+    });
 });

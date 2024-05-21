@@ -145,7 +145,7 @@ echo "<script>var shippingData = $json_data;</script>";
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="telefono_mittente">Cellulare:</label>
-                                        <input type="text" class="form-control" name="telefono_mittente" id="telefono_mittente" maxlength="10" pattern="\d{5}" required>
+                                        <input type="text" class="form-control" name="telefono_mittente" id="telefono_mittente" maxlength="10" pattern="\d{10}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -198,7 +198,7 @@ echo "<script>var shippingData = $json_data;</script>";
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="telefono_destinatario">Cellulare:</label>
-                                        <input type="text" class="form-control" name="telefono_destinatario" id="telefono_destinatario" maxlength="10" pattern="\d{5}" required>
+                                        <input type="text" class="form-control" name="telefono_destinatario" id="telefono_destinatario" maxlength="10" pattern="\d{10}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
