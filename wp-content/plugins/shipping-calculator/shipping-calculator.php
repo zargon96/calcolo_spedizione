@@ -13,16 +13,16 @@ if (!defined('ABSPATH')) {
 class Shipping_Calculator_Plugin {
 
     public function __construct() {
-        // Aggiunge shortcode
+        // shortcode
         add_shortcode( 'shipping_calculator', [ $this, 'render_shortcode' ] );
 
-        // Aggiunge azioni AJAX
+        // AJAX
         add_action( 'wp_ajax_calculate_shipping', [ $this, 'calculate_shipping' ] );
         add_action( 'wp_ajax_nopriv_calculate_shipping', [ $this, 'calculate_shipping' ] );
         add_action( 'wp_ajax_submit_request', [ $this, 'submit_request' ] );
         add_action( 'wp_ajax_nopriv_submit_request', [ $this, 'submit_request' ] );
 
-        // Aggiunge scripts e stili
+        // scripts e stili
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
     }
 
@@ -107,7 +107,7 @@ class Shipping_Calculator_Plugin {
 
         foreach ($required_fields as $field) {
             if (empty($_POST[$field])) {
-                $errors[] = "&bull; Il campo {$field} è obbligatorio. <br/>";
+                $errors[] = "<br/> &bull; Il campo {$field} è obbligatorio.";
             }
         }
 

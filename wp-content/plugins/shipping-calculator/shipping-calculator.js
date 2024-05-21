@@ -27,12 +27,26 @@ jQuery(document).ready(function($) {
         });
     }
 
-    tipoSpedizioneSelect.change(updatePalletTypes);
-    destinazioneSelect.change(updatePalletTypes);
-    partenzaSelect.change(updatePalletTypes);
+    function updateProvince() {
+        var partenza = partenzaSelect.val();
+        var destinazione = destinazioneSelect.val();
+        $('#provincia_mittente').val(partenza);
+        $('#provincia_destinatario').val(destinazione);
+    }
 
-    // Inizializza i tipi di pallet alla prima esecuzione
+    tipoSpedizioneSelect.change(updatePalletTypes);
+    destinazioneSelect.change(function() {
+        updatePalletTypes();
+        updateProvince();
+    });
+    partenzaSelect.change(function() {
+        updatePalletTypes();
+        updateProvince();
+    });
+
+    // Inizializza i tipi di pallet e le province alla prima esecuzione
     updatePalletTypes();
+    updateProvince();
 
     calculateButton.click(function() {
         var partenza = partenzaSelect.val();
@@ -126,11 +140,21 @@ jQuery(document).ready(function($) {
                     window.location.href = window.location.href.split('?')[0] + '?success=1';
                 }, 2000);
             } else {
-                // Mostra l'avviso di errore sopra e sotto il modulo
                 $('.alert').remove(); // Rimuovi eventuali avvisi esistenti
-                $('#alertContainer').prepend('<div class="alert alert-danger alert-dismissible fade show" role="alert">Errore: ' + response.data.errors.join(', ') + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');                
+                $('#alertContainer').prepend('<div class="alert alert-danger alert-dismissible fade show" role="alert">Errore: ' + response.data.errors.join('') + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');    
+                // Scrolla alla posizione dell'alert di errore
+                $('html, body').animate({
+                    scrollTop: $('#alertContainer').offset().top
+                }, 'slow');            
             }
         })
     });
+    // Funzione per permettere solo numeri nei campi CAP e massimo 5 cifre
+    $('#cap_mittente, #cap_destinatario').on('input', function() {
+        this.value = this.value.replace(/\D/g, '').substring(0, 5);
+    });
+    // Funzione per permettere solo numeri nel cellulare con massimo 10 cifre
+    $('#telefono_mittente, #telefono_destinatario').on('input', function() {
+        this.value = this.value.replace(/\D/g, '').substring(0, 10);
+    });
 });
-

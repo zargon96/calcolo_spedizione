@@ -124,22 +124,28 @@ echo "<script>var shippingData = $json_data;</script>";
                                         <input type="text" class="form-control" name="indirizzo_mittente" id="indirizzo_mittente" required>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="citta_mittente">Città:</label>
                                         <input type="text" class="form-control" name="citta_mittente" id="citta_mittente" required>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="cap_mittente">CAP:</label>
-                                        <input type="text" class="form-control" name="cap_mittente" id="cap_mittente" required>
+                                        <input type="text" class="form-control" name="cap_mittente" id="cap_mittente" maxlength="5" pattern="\d{5}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="provincia_mittente">Provincia:</label>
+                                        <input type="text" class="form-control" name="provincia_mittente" id="provincia_mittente" disabled>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="telefono_mittente">Cellulare:</label>
-                                        <input type="text" class="form-control" name="telefono_mittente" id="telefono_mittente" required>
+                                        <input type="text" class="form-control" name="telefono_mittente" id="telefono_mittente" maxlength="10" pattern="\d{5}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -171,22 +177,28 @@ echo "<script>var shippingData = $json_data;</script>";
                                         <input type="text" class="form-control" name="indirizzo_destinatario" id="indirizzo_destinatario" required>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="citta_destinatario">Città:</label>
                                         <input type="text" class="form-control" name="citta_destinatario" id="citta_destinatario" required>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="cap_destinatario">CAP:</label>
-                                        <input type="text" class="form-control" name="cap_destinatario" id="cap_destinatario" required>
+                                        <input type="text" class="form-control" name="cap_destinatario" id="cap_destinatario" maxlength="5" pattern="\d{5}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="provincia_destinatario">Provincia:</label>
+                                        <input type="text" class="form-control" name="provincia_destinatario" id="provincia_destinatario" disabled>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="telefono_destinatario">Cellulare:</label>
-                                        <input type="text" class="form-control" name="telefono_destinatario" id="telefono_destinatario" required>
+                                        <input type="text" class="form-control" name="telefono_destinatario" id="telefono_destinatario" maxlength="10" pattern="\d{5}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
