@@ -8,6 +8,20 @@ jQuery(document).ready(function($) {
     var submitButton = $('#submitButton');
     var datiPersonaliDiv = $('#datiPersonali');
     var nextbutton = $('#nextbutton');
+    var fields = [
+        '#nome_mittente', 
+        '#indirizzo_mittente', 
+        '#citta_mittente', 
+        '#cap_mittente', 
+        '#telefono_mittente', 
+        '#email_mittente',
+        '#nome_destinatario', 
+        '#indirizzo_destinatario', 
+        '#citta_destinatario', 
+        '#cap_destinatario', 
+        '#telefono_destinatario', 
+        '#email_destinatario'
+    ];
 
     // Initialize Select2 with tagging
     $('.js-example-tags').select2({
@@ -157,7 +171,7 @@ jQuery(document).ready(function($) {
     $('#telefono_mittente, #telefono_destinatario').on('input', function() {
         this.value = this.value.replace(/\D/g, '').substring(0, 10);
     });
-    // Funzioni di validazione
+    // Funzioni di validazione con classi bootstrap
     function validateField(field) {
         if (field.checkValidity()) {
             field.classList.remove('is-invalid');
@@ -168,12 +182,14 @@ jQuery(document).ready(function($) {
         }
     }
 
-    $('#nome_mittente, #indirizzo_mittente, #citta_mittente, #cap_mittente, #telefono_mittente, #email_mittente, #nome_destinatario, #indirizzo_destinatario, #citta_destinatario, #cap_destinatario, #telefono_destinatario, #email_destinatario').on('input', function() {
+    // Associa l'evento 'input' a tutti i campi nell'array
+    $(fields.join(',')).on('input', function() {
         validateField(this);
     });
 
+    // Associa l'evento 'click' al pulsante di submit
     submitButton.click(function() {
-        $('#nome_mittente, #indirizzo_mittente, #citta_mittente, #cap_mittente, #telefono_mittente, #email_mittente, #nome_destinatario, #indirizzo_destinatario, #citta_destinatario, #cap_destinatario, #telefono_destinatario, #email_destinatario').each(function() {
+        $(fields.join(',')).each(function() {
             validateField(this);
         });
     });

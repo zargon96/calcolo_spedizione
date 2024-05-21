@@ -100,9 +100,18 @@ class Shipping_Calculator_Plugin {
 
         // Check required fields
         $required_fields = [
-            'nome_mittente', 'indirizzo_mittente', 'citta_mittente', 'cap_mittente', 'telefono_mittente', 'email_mittente',
-            'nome_destinatario', 'indirizzo_destinatario', 'citta_destinatario', 'cap_destinatario', 'telefono_destinatario', 'email_destinatario',
-            'partenza', 'destinazione', 'tipoSpedizione', 'tipoPallet', 'costoSpedizione'
+            'nome_mittente', 
+            'indirizzo_mittente', 
+            'citta_mittente', 
+            'cap_mittente', 
+            'telefono_mittente', 
+            'email_mittente',
+            'nome_destinatario', 
+            'indirizzo_destinatario', 
+            'citta_destinatario', 
+            'cap_destinatario', 
+            'telefono_destinatario', 
+            'email_destinatario',
         ];
 
         foreach ($required_fields as $field) {
