@@ -115,7 +115,7 @@ echo "<script>var shippingData = $json_data;</script>";
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="nome_mittente">Nominativo:</label>
-                                        <input type="text" class="form-control" name="nome_mittente" id="nome_mittente" required>
+                                        <input type="text" class="form-control" name="nome_mittente" id="nome_mittente" pattern="[A-Za-z\s]+" required>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
@@ -127,7 +127,7 @@ echo "<script>var shippingData = $json_data;</script>";
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="citta_mittente">Città:</label>
-                                        <input type="text" class="form-control" name="citta_mittente" id="citta_mittente" required>
+                                        <input type="text" class="form-control" name="citta_mittente" id="citta_mittente" pattern="[A-Za-z\s]+" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -168,7 +168,7 @@ echo "<script>var shippingData = $json_data;</script>";
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="nome_destinatario">Nominativo:</label>
-                                        <input type="text" class="form-control" name="nome_destinatario" id="nome_destinatario" required>
+                                        <input type="text" class="form-control" name="nome_destinatario" id="nome_destinatario" pattern="[A-Za-z\s]+" required>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
@@ -180,7 +180,7 @@ echo "<script>var shippingData = $json_data;</script>";
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="citta_destinatario">Città:</label>
-                                        <input type="text" class="form-control" name="citta_destinatario" id="citta_destinatario" required>
+                                        <input type="text" class="form-control" name="citta_destinatario" id="citta_destinatario" pattern="[A-Za-z\s]+" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4">

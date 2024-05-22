@@ -171,6 +171,17 @@ jQuery(document).ready(function($) {
     $('#telefono_mittente, #telefono_destinatario').on('input', function() {
         this.value = this.value.replace(/\D/g, '').substring(0, 10);
     });
+    // Funzione per permettere solo lettere
+    function allowOnlyLetters(input) {
+        var value = input.value;
+        var regex = /[^a-zA-Z\s]/g;
+        input.value = value.replace(regex, '');
+    }
+
+    // Associa l'evento 'input' ai campi 'nominativo' e 'città'
+    $('#nome_mittente, #citta_mittente, #nome_destinatario, #citta_destinatario').on('input', function() {
+        allowOnlyLetters(this);
+    });
     // Funzioni di validazione con classi bootstrap
     function validateField(field) {
         if (field.checkValidity()) {
