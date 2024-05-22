@@ -75,18 +75,18 @@ class Shipping_Calculator_Plugin {
         $tariffaBase = floatval( $rates[$destinazione][$tipoSpedizione][$tipoPallet] ) ?? 0;
         $costoSpedizione = $tariffaBase;
 
-        if ( $opzioniAggiuntive === 'sponda_idraulica' ) {
-            $costoSpedizione += 50;
-            $costoSpedizione *= 1.03;
+        $opzioni = [
+            'sponda_idraulica' => ['costo' => 50, 'moltiplicatore' => 1.03],
+            'assicurazione' => ['costo' => 20, 'moltiplicatore' => 1.02],
+            'consegna_rapida' => ['costo' => 30, 'moltiplicatore' => 1.05],
+        ];
+        
+        // Applica le opzioni aggiuntive se presenti
+        if (isset($opzioni[$opzioniAggiuntive])) {
+            $costoSpedizione += $opzioni[$opzioniAggiuntive]['costo'];
+            $costoSpedizione *= $opzioni[$opzioniAggiuntive]['moltiplicatore'];
         }
-        if ( $opzioniAggiuntive === 'assicurazione' ) {
-            $costoSpedizione += 20;
-            $costoSpedizione *= 1.02;
-        }
-        if ( $opzioniAggiuntive === 'consegna_rapida' ) {
-            $costoSpedizione += 30;
-            $costoSpedizione *= 1.05;
-        }
+        
         if ( $partenza !== 'FI' && $partenza !== 'PO' ) {
             $costoSpedizione *= 1.10;
         }
