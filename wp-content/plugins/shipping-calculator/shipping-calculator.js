@@ -1,7 +1,7 @@
 jQuery(document).ready(function($) {
     var tipoSpedizioneSelect = $('#tipo_spedizione');
-    var destinazioneSelect = $('#destinazione');
     var partenzaSelect = $('#partenza');
+    var destinazioneSelect = $('#destinazione');
     var tipoPalletSelect = $('#tipo_pallet');
     var opzioniAggiuntiveSelect = $('#opzioni_aggiuntive');
     var calculateButton = $('#calculateButton');
