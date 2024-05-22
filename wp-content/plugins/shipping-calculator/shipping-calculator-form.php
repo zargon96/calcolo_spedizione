@@ -211,9 +211,13 @@ echo "<script>var shippingData = $json_data;</script>";
                         </form>
                     </div>
                 </div>
-
-                <div class="mt-3 text-right">
-                    <button type="button" class="btn btn-success" id="submitButton">Invia richiesta</button>
+                <div class="row">
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-secondary backButton" >Indietro</button>
+                    </div>
+                    <div class="col-md-6 text-right">
+                        <button type="button" class="btn btn-success" id="submitButton">Invia richiesta</button>
+                    </div>
                 </div>
             </div>
             
@@ -258,6 +262,9 @@ echo "<script>var shippingData = $json_data;</script>";
                                     <strong>Costo Totale:</strong>
                                     <p class="card-text" id="summaryCosto"></p>
                                 </div>
+                            </div>
+                            <div class="col-md-12 text-center">
+                                <button type="button" class="btn btn-secondary backButton">modifica spedizione</button>
                             </div>
                         </div>
                     </div>

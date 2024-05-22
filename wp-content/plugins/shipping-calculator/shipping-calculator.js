@@ -8,6 +8,7 @@ jQuery(document).ready(function($) {
     var submitButton = $('#submitButton');
     var datiPersonaliDiv = $('#datiPersonali');
     var nextbutton = $('#nextbutton');
+    var backButton = $('.backButton');
     var fields = [
         '#nome_mittente', 
         '#indirizzo_mittente', 
@@ -97,6 +98,11 @@ jQuery(document).ready(function($) {
         datiPersonaliDiv.show(); // Mostra i campi dei dati anagrafici
     });
 
+    backButton.click(function() { 
+        datiPersonaliDiv.hide();
+        $('#spedizioneForm').show(); // Mostra il modulo di spedizione
+    });
+
     submitButton.click(function() {
         var form = $('#spedizioneForm')[0];
         if (!form.checkValidity()) {
@@ -150,9 +156,6 @@ jQuery(document).ready(function($) {
             if (response.success) {
                 // Mostra l'avviso di successo
                 $('#alertContainer').html('<div class="alert alert-success alert-dismissible fade show" role="alert">Richiesta inviata con successo.<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
-                setTimeout(function() {
-                    window.location.href = window.location.href.split('?')[0] + '?success=1';
-                }, 2000);
             } else {
                 $('.alert').remove(); // Rimuovi eventuali avvisi esistenti
                 $('#alertContainer').prepend('<div class="alert alert-danger alert-dismissible fade show" role="alert">Errore: ' + response.data.errors.join('') + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');    
@@ -161,16 +164,26 @@ jQuery(document).ready(function($) {
                     scrollTop: $('#alertContainer').offset().top
                 }, 'slow');            
             }
-        })
+        }).fail(function() {
+            $('.alert').remove(); // Rimuovi eventuali avvisi esistenti
+            $('#alertContainer').prepend('<div class="alert alert-danger alert-dismissible fade show" role="alert">Errore di rete. Per favore riprova più tardi.<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');    
+            // Scrolla alla posizione dell'alert di errore
+            $('html, body').animate({
+                scrollTop: $('#alertContainer').offset().top
+            }, 'slow');
+        });
     });
+
     // Funzione per permettere solo numeri nei campi CAP e massimo 5 cifre
     $('#cap_mittente, #cap_destinatario').on('input', function() {
         this.value = this.value.replace(/\D/g, '').substring(0, 5);
     });
+
     // Funzione per permettere solo numeri nel cellulare con massimo 10 cifre
     $('#telefono_mittente, #telefono_destinatario').on('input', function() {
         this.value = this.value.replace(/\D/g, '').substring(0, 10);
     });
+
     // Funzione per permettere solo lettere
     function allowOnlyLetters(input) {
         var value = input.value;
@@ -182,6 +195,7 @@ jQuery(document).ready(function($) {
     $('#nome_mittente, #citta_mittente, #nome_destinatario, #citta_destinatario').on('input', function() {
         allowOnlyLetters(this);
     });
+
     // Funzioni di validazione con classi bootstrap
     function validateField(field) {
         if (field.checkValidity()) {
