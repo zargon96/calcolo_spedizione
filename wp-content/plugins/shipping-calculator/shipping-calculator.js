@@ -44,7 +44,7 @@ jQuery(document).ready(function($) {
             }));
         });
     }
-
+    
     function updateProvince() {
         var partenza = partenzaSelect.val();
         var destinazione = destinazioneSelect.val();
