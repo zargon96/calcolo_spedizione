@@ -23,6 +23,18 @@ body {
 #requestResult {
     margin-top: 20px;
 }
+
+#nextbutton {
+    width: 200px;
+}
+
+#nextbutton:disabled {
+    cursor: not-allowed;
+    background-color: #ccc; 
+    border-color: #ccc; 
+    color: #666;
+}
+
 .hidden {
     display: none;
 }

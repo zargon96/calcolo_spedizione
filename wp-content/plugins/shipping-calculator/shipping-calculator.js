@@ -24,6 +24,9 @@ jQuery(document).ready(function($) {
         '#email_destinatario'
     ];
 
+    // Disable the "Avanti" button initially
+    nextbutton.prop('disabled', true);
+
     // Initialize Select2 with tagging
     $('.js-example-tags').select2({
         tags: true,
@@ -49,15 +52,30 @@ jQuery(document).ready(function($) {
         $('#provincia_destinatario').val(destinazione);
     }
 
-    tipoSpedizioneSelect.change(updatePalletTypes);
+    // Disable the "Avanti" button when any select field is changed
+    function disableNextButton() {
+        nextbutton.prop('disabled', true);
+    }
+
+    tipoSpedizioneSelect.change(function() {
+        updatePalletTypes();
+        disableNextButton();
+    });
+    
     destinazioneSelect.change(function() {
         updatePalletTypes();
         updateProvince();
+        disableNextButton();
     });
+    
     partenzaSelect.change(function() {
         updatePalletTypes();
         updateProvince();
+        disableNextButton();
     });
+
+    tipoPalletSelect.change(disableNextButton);
+    opzioniAggiuntiveSelect.change(disableNextButton);
 
     // Inizializza i tipi di pallet e le province alla prima esecuzione
     updatePalletTypes();
@@ -87,7 +105,8 @@ jQuery(document).ready(function($) {
             $('#summaryOpzioni').text(opzioniAggiuntive);
             $('#summaryCosto').text('€' + response);
             $('#summary').removeClass('hidden'); // Mostra il riepilogo
-            $('#nextbutton').show();
+            nextbutton.show();
+            nextbutton.prop('disabled', false); // Enable the "Avanti" button
         }).fail(function() {
             alert('Errore nel calcolo del costo di spedizione!');
         });
@@ -101,6 +120,7 @@ jQuery(document).ready(function($) {
     backButton.click(function() { 
         datiPersonaliDiv.hide();
         $('#spedizioneForm').show(); // Mostra il modulo di spedizione
+        disableNextButton(); // Disable the "Avanti" button when going back
     });
 
     submitButton.click(function() {
@@ -219,3 +239,5 @@ jQuery(document).ready(function($) {
         });
     });
 });
+
+
