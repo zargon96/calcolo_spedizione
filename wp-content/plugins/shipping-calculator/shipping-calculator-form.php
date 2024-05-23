@@ -37,7 +37,7 @@ echo "<script>var shippingData = $json_data;</script>";
 
 <form id="spedizioneForm" class="container">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="form-group">
                 <label for="partenza">Partenza:</label>
                 <select name="partenza" class="form-control js-example-tags" id="partenza" data-calc="true" required>
@@ -47,7 +47,7 @@ echo "<script>var shippingData = $json_data;</script>";
                 </select>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="form-group">
                 <label for="destinazione">Destinazione:</label>
                 <select name="destinazione" class="form-control js-example-tags" id="destinazione" data-calc="true" required>
@@ -57,40 +57,62 @@ echo "<script>var shippingData = $json_data;</script>";
                 </select>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <label for="tipo_spedizione">Tipo di Spedizione:</label>
-                <select name="tipo_spedizione" class="form-control" id="tipo_spedizione" data-calc="true" required>
-                    <option value="express">Express</option>
-                    <option value="standard">Standard</option>
-                </select>
+        <div class="col-md-4">
+        <div class="form-group">
+            <label for="tipo_spedizione">Tipo di Spedizione:</label>
+            <div id="tipo_spedizione_container">
+                <label>
+                    <input type="radio" name="tipo_spedizione" value="express" checked required> Express
+                </label>
+                <label>
+                    <input type="radio" name="tipo_spedizione" value="standard" required> Standard
+                </label>
             </div>
         </div>
-        <div class="col-md-6">
+
+        </div>
+        <div class="col-md-8">
             <div class="form-group">
                 <label for="tipo_pallet">Tipo di Pallet:</label>
-                <select name="tipo_pallet" class="form-control" id="tipo_pallet" data-calc="true" required>
+                <div id="tipo_pallet_container" class="row">
                     <?php
-                    foreach ( $pallet_types as $palletType ) {
-                        echo "<option value='$palletType'>$palletType</option>";
+                    foreach ($pallet_types as $palletType) {
+                        $description = 'fino a 100kg'; 
+                        echo "
+                        <div class='pallet-option col-md-1' data-pallet='$palletType'>
+                        <img src='" . plugin_dir_url(__FILE__) . "img/pallet.png' alt='$palletType'>
+                            <div class='pallet-info'>
+                                <h5>$palletType</h5>
+                                <p>$description</p>
+                            </div>
+                        </div>";
                     }
                     ?>
-                </select>
+                </div>
+                <input type="hidden" name="tipo_pallet" id="tipo_pallet" required>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="form-group">
                 <label for="opzioni_aggiuntive">Opzioni aggiuntive:</label>
-                <select name="opzioni_aggiuntive" class="form-control" id="opzioni_aggiuntive">
-                    <option value="none">Nessuna</option>
-                    <option value="sponda_idraulica">Consegna con sponda idraulica</option>
-                    <option value="assicurazione">Assicurazione</option>
-                    <option value="consegna_rapida">Consegna rapida</option>
-                </select>
+                <div id="opzioni_aggiuntive">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="opzioni_aggiuntive[]" id="sponda_idraulica" value="sponda_idraulica">
+                        <label class="form-check-label" for="sponda_idraulica">Consegna con sponda idraulica</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="opzioni_aggiuntive[]" id="assicurazione" value="assicurazione">
+                        <label class="form-check-label" for="assicurazione">Assicurazione</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="opzioni_aggiuntive[]" id="consegna_rapida" value="consegna_rapida">
+                        <label class="form-check-label" for="consegna_rapida">Consegna rapida</label>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-md-12 text-right">
-            <button type="button" class="btn btn-primary" id="calculateButton">Calcola tariffa</button>
+            <button type="button" class="btn btn-primary" id="calculateButton" disabled>Calcola tariffa</button>
         </div>
 
         <div class="col-md-12">
@@ -114,26 +136,26 @@ echo "<script>var shippingData = $json_data;</script>";
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label for="nome_mittente">Nominativo:</label>
-                                        <input type="text" class="form-control" name="nome_mittente" id="nome_mittente" pattern="[A-Za-z\s]+" required>
+                                        <label for="mittente[nome]">Nominativo:</label>
+                                        <input type="text" class="form-control" name="mittente[nome]" id="mittente[nome]" required>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label for="indirizzo_mittente">Indirizzo:</label>
-                                        <input type="text" class="form-control" name="indirizzo_mittente" id="indirizzo_mittente" required>
+                                        <label for="mittente[indirizzo]">Indirizzo:</label>
+                                        <input type="text" class="form-control" name="mittente[indirizzo]" id="mittente[indirizzo]" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="citta_mittente">Città:</label>
-                                        <input type="text" class="form-control" name="citta_mittente" id="citta_mittente" pattern="[A-Za-z\s]+" required>
+                                        <label for="mittente[citta]">Città:</label>
+                                        <input type="text" class="form-control" name="mittente[citta]" id="mittente[citta]" pattern="[A-Za-z\s]+" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="cap_mittente">CAP:</label>
-                                        <input type="text" class="form-control" name="cap_mittente" id="cap_mittente" maxlength="5" pattern="\d{5}" required>
+                                        <label for="mittente[cap]">CAP:</label>
+                                        <input type="text" class="form-control" name="mittente[cap]" id="mittente[cap]" maxlength="5" pattern="\d{5}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -144,14 +166,14 @@ echo "<script>var shippingData = $json_data;</script>";
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="telefono_mittente">Cellulare:</label>
-                                        <input type="text" class="form-control" name="telefono_mittente" id="telefono_mittente" maxlength="10" pattern="\d{10}" required>
+                                        <label for="mittente[telefono]">Cellulare:</label>
+                                        <input type="text" class="form-control" name="mittente[telefono]" id="mittente[telefono]" maxlength="10" pattern="\d{10}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="email_mittente">Email:</label>
-                                        <input type="email" class="form-control" name="email_mittente" id="email_mittente" required>
+                                        <label for="mittente[email]">Email:</label>
+                                        <input type="email" class="form-control" name="mittente[email]" id="mittente[email]" required>
                                     </div>
                                 </div>
                             </div>
@@ -167,26 +189,26 @@ echo "<script>var shippingData = $json_data;</script>";
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label for="nome_destinatario">Nominativo:</label>
-                                        <input type="text" class="form-control" name="nome_destinatario" id="nome_destinatario" pattern="[A-Za-z\s]+" required>
+                                        <label for="destinatario[nome]">Nominativo:</label>
+                                        <input type="text" class="form-control" name="destinatario[nome]" id="destinatario[nome]" required>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label for="indirizzo_destinatario">Indirizzo:</label>
-                                        <input type="text" class="form-control" name="indirizzo_destinatario" id="indirizzo_destinatario" required>
+                                        <label for="destinatario[indirizzo]">Indirizzo:</label>
+                                        <input type="text" class="form-control" name="destinatario[indirizzo]" id="destinatario[indirizzo]" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="citta_destinatario">Città:</label>
-                                        <input type="text" class="form-control" name="citta_destinatario" id="citta_destinatario" pattern="[A-Za-z\s]+" required>
+                                        <label for="destinatario[citta]">Città:</label>
+                                        <input type="text" class="form-control" name="destinatario[citta]" id="destinatario[citta]" pattern="[A-Za-z\s]+" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="cap_destinatario">CAP:</label>
-                                        <input type="text" class="form-control" name="cap_destinatario" id="cap_destinatario" maxlength="5" pattern="\d{5}" required>
+                                        <label for="destinatario[cap]">CAP:</label>
+                                        <input type="text" class="form-control" name="destinatario[cap]" id="destinatario[cap]" maxlength="5" pattern="\d{5}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -197,14 +219,14 @@ echo "<script>var shippingData = $json_data;</script>";
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="telefono_destinatario">Cellulare:</label>
-                                        <input type="text" class="form-control" name="telefono_destinatario" id="telefono_destinatario" maxlength="10" pattern="\d{10}" required>
+                                        <label for="destinatario[telefono]">Cellulare:</label>
+                                        <input type="text" class="form-control" name="destinatario[telefono]" id="destinatario[telefono]" maxlength="10" pattern="\d{10}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="email_destinatario">Email:</label>
-                                        <input type="email" class="form-control" name="email_destinatario" id="email_destinatario" required>
+                                        <label for="destinatario[email]">Email:</label>
+                                        <input type="email" class="form-control" name="destinatario[email]" id="destinatario[email]" required>
                                     </div>
                                 </div>
                             </div>

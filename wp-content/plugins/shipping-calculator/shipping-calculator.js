@@ -1,27 +1,201 @@
+var provinceMap = {
+    "AO": "Aosta",
+    "AL": "Alessandria",
+    "AT": "Asti",
+    "BI": "Biella",
+    "CN": "Cuneo",
+    "GD Torino": "Torino",
+    "GD Novara": "Novara",
+    "NO": "Novara",
+    "TO": "Torino",
+    "VB": "Verbano-Cusio-Ossola",
+    "VC": "Vercelli",
+    "BG": "Bergamo",
+    "BS": "Brescia",
+    "CO": "Como",
+    "CO (Lago)": "Como (Lago)",
+    "Campione": "Campione d'Italia",
+    "CR": "Cremona",
+    "GD Milano": "Milano",
+    "LC": "Lecco",
+    "LC (Lago)": "Lecco (Lago)",
+    "LO": "Lodi",
+    "MB": "Monza e della Brianza",
+    "MI": "Milano",
+    "MI (ZTL)": "Milano (ZTL)",
+    "MN": "Mantova",
+    "PV": "Pavia",
+    "SO": "Sondrio",
+    "VA": "Varese",
+    "BL": "Belluno",
+    "PD": "Padova",
+    "RO": "Rovigo",
+    "TV": "Treviso",
+    "VE": "Venezia",
+    "VE (Laguna)": "Venezia (Laguna)",
+    "VI": "Vicenza",
+    "VR": "Verona",
+    "BZ": "Bolzano",
+    "TN": "Trento",
+    "GO": "Gorizia",
+    "PN": "Pordenone",
+    "TS": "Trieste",
+    "UD": "Udine",
+    "GE": "Genova",
+    "IM": "Imperia",
+    "SP": "La Spezia",
+    "SV": "Savona",
+    "BO": "Bologna",
+    "FC": "Forlì-Cesena",
+    "FE": "Ferrara",
+    "MO": "Modena",
+    "MO (Montagna)": "Modena (Montagna)",
+    "PC": "Piacenza",
+    "PR": "Parma",
+    "RA": "Ravenna",
+    "RE": "Reggio Emilia",
+    "RN": "Rimini",
+    "SM": "San Marino",
+    "AR": "Arezzo",
+    "FI": "Firenze",
+    "GR": "Grosseto",
+    "GR (Isole)": "Grosseto (Isole)",
+    "LI": "Livorno",
+    "LI (Elba)": "Livorno (Elba)",
+    "LI (Capraia)": "Livorno (Capraia)",
+    "LU": "Lucca",
+    "MS": "Massa e Carrara",
+    "PI": "Pisa",
+    "PI (Volterra)": "Pisa (Volterra)",
+    "PO": "Prato",
+    "PT": "Pistoia",
+    "SI": "Siena",
+    "AN": "Ancona",
+    "AP": "Ascoli Piceno",
+    "FM": "Fermo",
+    "MC": "Macerata",
+    "PU": "Pesaro e Urbino",
+    "PG": "Perugia",
+    "TR": "Terni",
+    "FR": "Frosinone",
+    "LT": "Latina",
+    "LT (Isole)": "Latina (Isole)",
+    "RI": "Rieti",
+    "RM (Fuori GRA)": "Roma (Fuori GRA)",
+    "RM (GRA)": "Roma (GRA)",
+    "VT": "Viterbo",
+    "AQ": "L'Aquila",
+    "CH": "Chieti",
+    "PE": "Pescara",
+    "TE": "Teramo",
+    "CB": "Campobasso",
+    "IS": "Isernia",
+    "AV": "Avellino",
+    "BN": "Benevento",
+    "CE": "Caserta",
+    "NA": "Napoli",
+    "NA (Isole)": "Napoli (Isole)",
+    "NA (Capri)": "Napoli (Capri)",
+    "NA (Amalfitana)": "Napoli (Amalfitana)",
+    "SA": "Salerno",
+    "SA (Costiera)": "Salerno (Costiera)",
+    "BA": "Bari",
+    "BR": "Brindisi",
+    "BT": "Barletta-Andria-Trani",
+    "FG": "Foggia",
+    "FG (Isole)": "Foggia (Isole)",
+    "LE": "Lecce",
+    "TA": "Taranto",
+    "MT": "Matera",
+    "PZ": "Potenza",
+    "CS": "Cosenza",
+    "CZ": "Catanzaro",
+    "KR": "Crotone",
+    "RC": "Reggio Calabria",
+    "VV": "Vibo Valentia",
+    "AG": "Agrigento",
+    "AG (Isole)": "Agrigento (Isole)",
+    "CL": "Caltanissetta",
+    "CT": "Catania",
+    "EN": "Enna",
+    "ME": "Messina",
+    "ME (Isole)": "Messina (Isole)",
+    "PA": "Palermo",
+    "PA (Isole)": "Palermo (Isole)",
+    "RG": "Ragusa",
+    "SR": "Siracusa",
+    "TP": "Trapani",
+    "TP (Isole)": "Trapani (Isole)",
+    "CA": "Cagliari",
+    "NU": "Nuoro",
+    "OR": "Oristano",
+    "SS": "Sassari",
+    "SS (Isole)": "Sassari (Isole)",
+    "SU": "Sud Sardegna",
+    "SU (Isole)": "Sud Sardegna (Isole)"
+};
+
 jQuery(document).ready(function($) {
-    var tipoSpedizioneSelect = $('#tipo_spedizione');
+    var opzioniAggiuntiveLabels = {
+        'sponda_idraulica': 'Consegna con sponda idraulica',
+        'assicurazione': 'Assicurazione',
+        'consegna_rapida': 'Consegna rapida'
+    };
+
+    $('#tipo_pallet_container').on('click', '.pallet-option', function() {
+        $('.pallet-option').removeClass('selected');
+        $(this).addClass('selected');
+        var selectedPallet = $(this).data('pallet');
+        $('#tipo_pallet').val(selectedPallet);
+        disableNextButton(); // Disable the "Avanti" button initially
+        checkCalculateButton(); // Check the state of the calculate button
+    });
+
+    var calculateButton = $('#calculateButton');
+    var nextbutton = $('#nextbutton');
+    
+    function checkCalculateButton() {
+        var selectedPallet = $('#tipo_pallet').val();
+        var selectedSpedizione = $('input[name="tipo_spedizione"]:checked').val();
+        if (selectedPallet && selectedSpedizione) {
+            calculateButton.prop('disabled', false);
+        } else {
+            calculateButton.prop('disabled', true);
+        }
+    }
+
+    function updateProvinceDisplay() {
+        $('#partenza option, #destinazione option').each(function() {
+            var value = $(this).val();
+            if (provinceMap[value]) {
+                $(this).text(provinceMap[value]);
+            }
+        });
+    }
+
+    // Chiamata iniziale per aggiornare i nomi delle province
+    updateProvinceDisplay();
+
     var partenzaSelect = $('#partenza');
     var destinazioneSelect = $('#destinazione');
     var tipoPalletSelect = $('#tipo_pallet');
     var opzioniAggiuntiveSelect = $('#opzioni_aggiuntive');
-    var calculateButton = $('#calculateButton');
     var submitButton = $('#submitButton');
     var datiPersonaliDiv = $('#datiPersonali');
-    var nextbutton = $('#nextbutton');
     var backButton = $('.backButton');
     var fields = [
-        '#nome_mittente', 
-        '#indirizzo_mittente', 
-        '#citta_mittente', 
-        '#cap_mittente', 
-        '#telefono_mittente', 
-        '#email_mittente',
-        '#nome_destinatario', 
-        '#indirizzo_destinatario', 
-        '#citta_destinatario', 
-        '#cap_destinatario', 
-        '#telefono_destinatario', 
-        '#email_destinatario'
+        'mittente[nome]', 
+        'mittente[indirizzo]', 
+        'mittente[citta]', 
+        'mittente[cap]', 
+        'mittente[telefono]', 
+        'mittente[email]',
+        'destinatario[nome]', 
+        'destinatario[indirizzo]', 
+        'destinatario[citta]', 
+        'destinatario[cap]', 
+        'destinatario[telefono]', 
+        'destinatario[email]'
     ];
 
     // Disable the "Avanti" button initially
@@ -33,7 +207,7 @@ jQuery(document).ready(function($) {
     });
 
     function updatePalletTypes() {
-        var tipoSpedizione = tipoSpedizioneSelect.val();
+        var tipoSpedizione = $('input[name="tipo_spedizione"]:checked').val();
         var destinazione = destinazioneSelect.val();
         tipoPalletSelect.empty();
         var options = shippingData[destinazione][tipoSpedizione];
@@ -57,21 +231,24 @@ jQuery(document).ready(function($) {
         nextbutton.prop('disabled', true);
     }
 
-    tipoSpedizioneSelect.change(function() {
+    $('input[name="tipo_spedizione"]').change(function() {
         updatePalletTypes();
         disableNextButton();
+        checkCalculateButton();
     });
     
     destinazioneSelect.change(function() {
         updatePalletTypes();
         updateProvince();
         disableNextButton();
+        checkCalculateButton();
     });
     
     partenzaSelect.change(function() {
         updatePalletTypes();
         updateProvince();
         disableNextButton();
+        checkCalculateButton();
     });
 
     tipoPalletSelect.change(disableNextButton);
@@ -80,13 +257,17 @@ jQuery(document).ready(function($) {
     // Inizializza i tipi di pallet e le province alla prima esecuzione
     updatePalletTypes();
     updateProvince();
+    checkCalculateButton();
 
     calculateButton.click(function() {
         var partenza = partenzaSelect.val();
         var destinazione = destinazioneSelect.val();
-        var tipoSpedizione = tipoSpedizioneSelect.val();
+        var tipoSpedizione = $('input[name="tipo_spedizione"]:checked').val();
         var tipoPallet = tipoPalletSelect.val();
-        var opzioniAggiuntive = opzioniAggiuntiveSelect.val();
+        var opzioniAggiuntive = [];
+        $('#opzioni_aggiuntive input:checked').each(function() {
+            opzioniAggiuntive.push($(this).val());
+        });
 
         // Chiamata AJAX per calcolare il costo della spedizione
         $.post('/wp-admin/admin-ajax.php', {
@@ -98,11 +279,21 @@ jQuery(document).ready(function($) {
             opzioniAggiuntive: opzioniAggiuntive
         }, function(response) {
             $('#result').text('Il costo di spedizione è: €' + response);
-            $('#summaryPartenza').text(partenza);
-            $('#summaryDestinazione').text(destinazione);
+            $('#summaryPartenza').text(provinceMap[partenza] || partenza);
+            $('#summaryDestinazione').text(provinceMap[destinazione] || destinazione);
             $('#summaryTipoSpedizione').text(tipoSpedizione);
             $('#summaryTipoPallet').text(tipoPallet);
-            $('#summaryOpzioni').text(opzioniAggiuntive);
+
+            var opzioniAggiuntiveReadable = opzioniAggiuntive.map(function(opzione) {
+                return opzioniAggiuntiveLabels[opzione] || opzione;
+            });
+
+            if (opzioniAggiuntiveReadable.length > 0) {
+                $('#summaryOpzioni').text(opzioniAggiuntiveReadable.join(', '));
+            } else {
+                $('#summaryOpzioni').text('Nessuna opzione aggiuntiva aggiunta');
+            }
+            
             $('#summaryCosto').text('€' + response);
             $('#summary').removeClass('hidden'); // Mostra il riepilogo
             nextbutton.show();
@@ -130,42 +321,45 @@ jQuery(document).ready(function($) {
             return;
         }
 
-        var nomeMittente = $('#nome_mittente').val();
-        var indirizzoMittente = $('#indirizzo_mittente').val();
-        var cittaMittente = $('#citta_mittente').val();
-        var capMittente = $('#cap_mittente').val();
-        var telefonoMittente = $('#telefono_mittente').val();
-        var emailMittente = $('#email_mittente').val();
+        var nomeMittente = $('#mittente\\[nome\\]').val();
+        var indirizzoMittente = $('#mittente\\[indirizzo\\]').val();
+        var cittaMittente = $('#mittente\\[citta\\]').val();
+        var capMittente = $('#mittente\\[cap\\]').val();
+        var telefonoMittente = $('#mittente\\[telefono\\]').val();
+        var emailMittente = $('#mittente\\[email\\]').val();
 
-        var nomeDestinatario = $('#nome_destinatario').val();
-        var indirizzoDestinatario = $('#indirizzo_destinatario').val();
-        var cittaDestinatario = $('#citta_destinatario').val();
-        var capDestinatario = $('#cap_destinatario').val();
-        var telefonoDestinatario = $('#telefono_destinatario').val();
-        var emailDestinatario = $('#email_destinatario').val();
+        var nomeDestinatario = $('#destinatario\\[nome\\]').val();
+        var indirizzoDestinatario = $('#destinatario\\[indirizzo\\]').val();
+        var cittaDestinatario = $('#destinatario\\[citta\\]').val();
+        var capDestinatario = $('#destinatario\\[cap\\]').val();
+        var telefonoDestinatario = $('#destinatario\\[telefono\\]').val();
+        var emailDestinatario = $('#destinatario\\[email\\]').val();
 
         var partenza = $('#partenza').val();
         var destinazione = $('#destinazione').val();
-        var tipoSpedizione = $('#tipo_spedizione').val();
+        var tipoSpedizione = $('input[name="tipo_spedizione"]:checked').val();
         var tipoPallet = $('#tipo_pallet').val();
-        var opzioniAggiuntive = $('#opzioni_aggiuntive').val();
+        var opzioniAggiuntive = [];
+        $('#opzioni_aggiuntive input:checked').each(function() {
+            opzioniAggiuntive.push($(this).val());
+        });
         var costoSpedizione = $('#result').text().split('€')[1].trim();
 
         // Chiamata AJAX per inviare la richiesta
         $.post('/wp-admin/admin-ajax.php', {
             action: 'submit_request',
-            nome_mittente: nomeMittente,
-            indirizzo_mittente: indirizzoMittente,
-            citta_mittente: cittaMittente,
-            cap_mittente: capMittente,
-            telefono_mittente: telefonoMittente,
-            email_mittente: emailMittente,
-            nome_destinatario: nomeDestinatario,
-            indirizzo_destinatario: indirizzoDestinatario,
-            citta_destinatario: cittaDestinatario,
-            cap_destinatario: capDestinatario,
-            telefono_destinatario: telefonoDestinatario,
-            email_destinatario: emailDestinatario,
+            'mittente[nome]': nomeMittente,
+            'mittente[indirizzo]': indirizzoMittente,
+            'mittente[citta]': cittaMittente,
+            'mittente[cap]': capMittente,
+            'mittente[telefono]': telefonoMittente,
+            'mittente[email]': emailMittente,
+            'destinatario[nome]': nomeDestinatario,
+            'destinatario[indirizzo]': indirizzoDestinatario,
+            'destinatario[citta]': cittaDestinatario,
+            'destinatario[cap]': capDestinatario,
+            'destinatario[telefono]': telefonoDestinatario,
+            'destinatario[email]': emailDestinatario,
             partenza: partenza,
             destinazione: destinazione,
             tipoSpedizione: tipoSpedizione,
@@ -195,12 +389,12 @@ jQuery(document).ready(function($) {
     });
 
     // Funzione per permettere solo numeri nei campi CAP e massimo 5 cifre
-    $('#cap_mittente, #cap_destinatario').on('input', function() {
+    $('#mittente\\[cap\\], #destinatario\\[cap\\]').on('input', function() {
         this.value = this.value.replace(/\D/g, '').substring(0, 5);
     });
 
     // Funzione per permettere solo numeri nel cellulare con massimo 10 cifre
-    $('#telefono_mittente, #telefono_destinatario').on('input', function() {
+    $('#mittente\\[telefono\\], #destinatario\\[telefono\\]').on('input', function() {
         this.value = this.value.replace(/\D/g, '').substring(0, 10);
     });
 
@@ -212,7 +406,7 @@ jQuery(document).ready(function($) {
     }
 
     // Associa l'evento 'input' ai campi 'nominativo' e 'città'
-    $('#nome_mittente, #citta_mittente, #nome_destinatario, #citta_destinatario').on('input', function() {
+    $('#mittente\\[citta\\],#destinatario\\[citta\\]').on('input', function() {
         allowOnlyLetters(this);
     });
 
@@ -228,16 +422,18 @@ jQuery(document).ready(function($) {
     }
 
     // Associa l'evento 'input' a tutti i campi nell'array
-    $(fields.join(',')).on('input', function() {
+    $(fields.map(field => `#${field.replace(/\[/g, '\\[').replace(/\]/g, '\\]')}`).join(',')).on('input', function() {
         validateField(this);
     });
 
     // Associa l'evento 'click' al pulsante di submit
     submitButton.click(function() {
-        $(fields.join(',')).each(function() {
+        $(fields.map(field => `#${field.replace(/\[/g, '\\[').replace(/\]/g, '\\]')}`).join(',')).each(function() {
             validateField(this);
         });
     });
 });
+
+
 
 

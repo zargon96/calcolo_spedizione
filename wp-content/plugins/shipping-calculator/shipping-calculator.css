@@ -35,6 +35,17 @@ body {
     color: #666;
 }
 
+#calculateButton {
+    width: 200px;
+}
+
+#calculateButton:disabled {
+    cursor: not-allowed;
+    background-color: #ccc; 
+    border-color: #ccc; 
+    color: #666;
+}
+
 .hidden {
     display: none;
 }
@@ -46,4 +57,35 @@ body {
 
 input[disabled] {
     cursor: not-allowed;
+}
+
+.pallet-option {
+    border: 2px solid transparent;
+    border-radius: 5px;
+    margin: 10px;
+    cursor: pointer;
+    text-align: center;
+    padding: 10px;
+    transition: border-color 0.3s;
+}
+
+.pallet-option img {
+    max-width: 50px;
+    display: block;
+    margin: 0 auto;
+}
+
+.pallet-option.selected {
+    border-color: #007bff;
+}
+
+.pallet-info h5 {
+    margin: 10px 0 5px;
+    font-size: 16px;
+}
+
+.pallet-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
 }
