@@ -66,8 +66,7 @@ input[disabled] {
     cursor: pointer;
     margin-top: 5px;
     margin-bottom: 5px;
-    margin-left: 18px;
-    margin-right: 18px;
+    margin-left: 18px; 
     text-align: center !important;
     transition: border-color 0.3s;
 }

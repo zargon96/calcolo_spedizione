@@ -105,7 +105,7 @@ echo "<script>var shippingData = $json_data;</script>";
         </div>
         <div class="col-md-8">
             <div class="form-group pallet-container">
-                <label for="tipo_pallet">Tipo di Pallet:</label>
+                <label for="tipo_pallet">Seleziona la tipologia di Pallet:</label>
                 <div id="tipo_pallet_container" class="row">
                     <?php
                     foreach ($pallet_types as $palletType) {
