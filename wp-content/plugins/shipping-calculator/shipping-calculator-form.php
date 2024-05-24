@@ -1,4 +1,36 @@
 <?php
+
+$pallet_info = [
+    'FP' => [
+        'description' => 'Descrizione per FP',
+        'image' => plugin_dir_url(__FILE__) . 'img/pallet1.png'
+    ],
+    'LP' => [
+        'description' => 'Descrizione per LP',
+        'image' => plugin_dir_url(__FILE__) . 'img/pallet2.png'
+    ],
+    'ULP' => [
+        'description' => 'Descrizione per ULP',
+        'image' => plugin_dir_url(__FILE__) . 'img/pallet3.png'
+    ],
+    'HP' => [
+        'description' => 'Descrizione per HP',
+        'image' => plugin_dir_url(__FILE__) . 'img/pallet4.png'
+    ],
+    'ELP' => [
+        'description' => 'Descrizione per ELP',
+        'image' => plugin_dir_url(__FILE__) . 'img/pallet5.png'
+    ],
+    'QP' => [
+        'description' => 'Descrizione per QP',
+        'image' => plugin_dir_url(__FILE__) . 'img/pallet6.png'
+    ],
+    'MQP' => [
+        'description' => 'Descrizione per MQP',
+        'image' => plugin_dir_url(__FILE__) . 'img/pallet7.png'
+    ],
+];
+
 $csv_file_path = plugin_dir_path( __FILE__ ) . 'tariffe_consegna.csv';
 
 $csv_file = fopen( $csv_file_path, 'r' );
@@ -72,15 +104,16 @@ echo "<script>var shippingData = $json_data;</script>";
 
         </div>
         <div class="col-md-8">
-            <div class="form-group">
+            <div class="form-group pallet-container">
                 <label for="tipo_pallet">Tipo di Pallet:</label>
                 <div id="tipo_pallet_container" class="row">
                     <?php
                     foreach ($pallet_types as $palletType) {
-                        $description = 'fino a 100kg'; 
+                        $description = isset($pallet_info[$palletType]['description']) ? $pallet_info[$palletType]['description'] : 'Descrizione non disponibile';
+                        $image = isset($pallet_info[$palletType]['image']) ? $pallet_info[$palletType]['image'] : plugin_dir_url(__FILE__) . 'img/default.png';
                         echo "
                         <div class='pallet-option col-md-1' data-pallet='$palletType'>
-                        <img src='" . plugin_dir_url(__FILE__) . "img/pallet.png' alt='$palletType'>
+                            <img src='$image' alt='$palletType'>
                             <div class='pallet-info'>
                                 <h5>$palletType</h5>
                                 <p>$description</p>
@@ -167,7 +200,7 @@ echo "<script>var shippingData = $json_data;</script>";
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="mittente[telefono]">Cellulare:</label>
-                                        <input type="text" class="form-control" name="mittente[telefono]" id="mittente[telefono]" maxlength="10" pattern="\d{10}" required>
+                                        <input type="text" class="form-control" name="mittente[telefono]" id="mittente[telefono]" maxlength="10" pattern="\d{9,10}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -220,7 +253,7 @@ echo "<script>var shippingData = $json_data;</script>";
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="destinatario[telefono]">Cellulare:</label>
-                                        <input type="text" class="form-control" name="destinatario[telefono]" id="destinatario[telefono]" maxlength="10" pattern="\d{10}" required>
+                                        <input type="text" class="form-control" name="destinatario[telefono]" id="destinatario[telefono]" maxlength="10" pattern="\d{9,10}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">

@@ -265,6 +265,9 @@ class Shipping_Calculator_Plugin {
             fclose( $csv_file );
         }
 
+        
+        
+
         $tariffaBase = floatval( $rates[$destinazione][$tipoSpedizione][$tipoPallet] ) ?? 0;
         $costoSpedizione = $tariffaBase;
     
