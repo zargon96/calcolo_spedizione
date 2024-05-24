@@ -112,7 +112,7 @@ echo "<script>var shippingData = $json_data;</script>";
                         $description = isset($pallet_info[$palletType]['description']) ? $pallet_info[$palletType]['description'] : 'Descrizione non disponibile';
                         $image = isset($pallet_info[$palletType]['image']) ? $pallet_info[$palletType]['image'] : plugin_dir_url(__FILE__) . 'img/default.png';
                         echo "
-                        <div class='pallet-option col-md-1' data-pallet='$palletType'>
+                        <div class='pallet-option col-md-2' data-pallet='$palletType'>
                             <img src='$image' alt='$palletType'>
                             <div class='pallet-info'>
                                 <h5>$palletType</h5>
@@ -125,6 +125,7 @@ echo "<script>var shippingData = $json_data;</script>";
                 <input type="hidden" name="tipo_pallet" id="tipo_pallet" required>
             </div>
         </div>
+
         <div class="col-md-4">
             <div class="form-group">
                 <label for="opzioni_aggiuntive">Opzioni aggiuntive:</label>
@@ -144,6 +145,7 @@ echo "<script>var shippingData = $json_data;</script>";
                 </div>
             </div>
         </div>
+        
         <div class="col-md-12 text-right">
             <button type="button" class="btn btn-primary" id="calculateButton" disabled>Calcola tariffa</button>
         </div>
