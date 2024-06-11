@@ -434,6 +434,8 @@ var provinceMap = {
 //     });
 // });
 
+
+
 jQuery(document).ready(function($) {
     var opzioniAggiuntiveLabels = {
         'sponda_idraulica': 'Consegna con sponda idraulica',
@@ -732,7 +734,3 @@ jQuery(document).ready(function($) {
         });
     });
 });
-
-
-
-

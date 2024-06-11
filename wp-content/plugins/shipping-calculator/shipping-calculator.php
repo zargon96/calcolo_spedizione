@@ -9,9 +9,7 @@ Author: Revool
 // if (!defined('ABSPATH')) {
 //     exit;
 // }
-
 // class Shipping_Calculator_Plugin {
-
 //     public function __construct() {
 //         // shortcode
 //         add_shortcode( 'shipping_calculator', [ $this, 'render_shortcode' ] );
@@ -71,9 +69,6 @@ Author: Revool
 //             }
 //             fclose( $csv_file );
 //         }
-
-        
-        
 
 //         $tariffaBase = floatval( $rates[$destinazione][$tipoSpedizione][$tipoPallet] ) ?? 0;
 //         $costoSpedizione = $tariffaBase;
@@ -223,42 +218,42 @@ Author: Revool
 if (!defined('ABSPATH')) {
     exit;
 }
-add_filter('query_vars', [ 'Shipping_Calculator_Plugin', 'add_query_vars' ]);
-class Shipping_Calculator_Plugin {
 
+class Shipping_Calculator_Plugin {
     public function __construct() {
+        // filtro per le variabili di query
+        add_filter('query_vars', [$this, 'custom_query_vars']);
+
         // shortcode
-        add_shortcode( 'shipping_calculator', [ $this, 'render_shortcode' ] );
+        add_shortcode('shipping_calculator', [$this, 'render_shortcode']);
 
         // AJAX
-        add_action( 'wp_ajax_calculate_shipping', [ $this, 'calculate_shipping' ] );
-        add_action( 'wp_ajax_nopriv_calculate_shipping', [ $this, 'calculate_shipping' ] );
-        add_action( 'wp_ajax_submit_request', [ $this, 'submit_request' ] );
-        add_action( 'wp_ajax_nopriv_submit_request', [ $this, 'submit_request' ] );
+        add_action('wp_ajax_calculate_shipping', [$this, 'calculate_shipping']);
+        add_action('wp_ajax_nopriv_calculate_shipping', [$this, 'calculate_shipping']);
+        add_action('wp_ajax_submit_request', [$this, 'submit_request']);
+        add_action('wp_ajax_nopriv_submit_request', [$this, 'submit_request']);
 
         // scripts e stili
-        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
-
-        // Aggiungi le variabili della query
-        
+        add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
     }
 
-    public static function add_query_vars($public_query_vars) {
-        $public_query_vars[] = 'partenza';
-        $public_query_vars[] = 'destinazione';
-        $public_query_vars[] = 'tipoSpedizione';
-        $public_query_vars[] = 'tipoPallet';
-        $public_query_vars[] = 'opzioniAggiuntive';
-        $public_query_vars[] = 'mittente';
-        $public_query_vars[] = 'destinatario';
-        $public_query_vars[] = 'costoSpedizione';
-        return $public_query_vars;
+    public function custom_query_vars($vars) {
+        $vars[] = 'success';
+        $vars[] = 'partenza';
+        $vars[] = 'destinazione';
+        $vars[] = 'tipoSpedizione';
+        $vars[] = 'tipoPallet';
+        $vars[] = 'opzioniAggiuntive';
+        $vars[] = 'mittente';
+        $vars[] = 'destinatario';
+        $vars[] = 'costoSpedizione';
+        return $vars;
     }
 
     public function render_shortcode() {
         ob_start();
         echo '<div id="alertContainer">';
-        if ( isset( $_GET['success'] ) && $_GET['success'] == 1 ) {
+        if (get_query_var('success', '') == 1) {
             echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
                     Richiesta inviata con successo.
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -267,68 +262,98 @@ class Shipping_Calculator_Plugin {
                   </div>';
         }
 
-        include plugin_dir_path( __FILE__ ) . 'shipping-calculator-form.php';
+        include plugin_dir_path(__FILE__) . 'shipping-calculator-form.php';
 
         return ob_get_clean();
     }
 
     public function calculate_shipping() {
-        echo get_query_var('partenza'); exit();
-        $partenza = sanitize_text_field( get_query_var('partenza') );
-        $destinazione = sanitize_text_field( get_query_var('destinazione') );
-        $tipoSpedizione = sanitize_text_field( get_query_var('tipoSpedizione') );
-        $tipoPallet = sanitize_text_field( get_query_var('tipoPallet') );
+         // Imposta le variabili di query
+        set_query_var('partenza', sanitize_text_field($_POST['partenza']));
+        set_query_var('destinazione', sanitize_text_field($_POST['destinazione']));
+        set_query_var('tipoSpedizione', sanitize_text_field($_POST['tipoSpedizione']));
+        set_query_var('tipoPallet', sanitize_text_field($_POST['tipoPallet']));
+        set_query_var('opzioniAggiuntive', $_POST['opzioniAggiuntive']);
+
+        // Recupera le variabili di query
+        $partenza = get_query_var('partenza');
+        $destinazione = get_query_var('destinazione');
+        $tipoSpedizione = get_query_var('tipoSpedizione');
+        $tipoPallet = get_query_var('tipoPallet');
         $opzioniAggiuntive = get_query_var('opzioniAggiuntive', []);
 
-        $csv_file_path = plugin_dir_path( __FILE__ ) . 'tariffe_consegna.csv';
-        $csv_file = fopen( $csv_file_path, 'r' );
+        $csv_file_path = plugin_dir_path(__FILE__) . 'tariffe_consegna.csv';
+        $csv_file = fopen($csv_file_path, 'r');
         $rates = [];
-        if ( $csv_file !== false ) {
-            $headers = fgetcsv( $csv_file, 0, ';' );
-            while ( ( $data = fgetcsv( $csv_file, 0, ';' ) ) !== false ) {
+        if ($csv_file !== false) {
+            $headers = fgetcsv($csv_file, 0, ';');
+            while (($data = fgetcsv($csv_file, 0, ';')) !== false) {
                 $provincia = $data[0];
-                $data = array_map( function( $value ) {
-                    return str_replace( ',', '.', $value );
-                }, $data );
-
-                $express_rates = array_combine( array_slice( $headers, 2, 7 ), array_slice( $data, 2, 7 ) );
-                $standard_rates = array_combine( array_slice( $headers, 9, 7 ), array_slice( $data, 9, 7 ) );
-
+                $data = array_map(function ($value) {
+                    return str_replace(',', '.', $value);
+                }, $data);
+    
+                $express_rates = array_combine(array_slice($headers, 2, 7), array_slice($data, 2, 7));
+                $standard_rates = array_combine(array_slice($headers, 9, 7), array_slice($data, 9, 7));
+    
                 $rates[$provincia] = [
                     'express' => $express_rates,
                     'standard' => $standard_rates
                 ];
             }
-            fclose( $csv_file );
+            fclose($csv_file);
         }
 
         $tariffaBase = floatval( $rates[$destinazione][$tipoSpedizione][$tipoPallet] ) ?? 0;
         $costoSpedizione = $tariffaBase;
-
+    
         $opzioni = [
             'sponda_idraulica' => ['costo' => 50, 'moltiplicatore' => 1.03],
             'assicurazione' => ['costo' => 20, 'moltiplicatore' => 1.02],
             'consegna_rapida' => ['costo' => 30, 'moltiplicatore' => 1.05],
         ];
-
+    
         // Applica le opzioni aggiuntive se presenti
-        foreach ($opzioniAggiuntive as $opzione) {
-            if (isset($opzioni[$opzione])) {
-                $costoSpedizione += $opzioni[$opzione]['costo'];
-                $costoSpedizione *= $opzioni[$opzione]['moltiplicatore'];
+        if (!empty($opzioniAggiuntive)) {
+            $opzioniAggiuntiveArray = explode(',', $opzioniAggiuntive);
+            foreach ($opzioniAggiuntiveArray as $opzione) {
+                if (isset($opzioni[$opzione])) {
+                    $costoSpedizione += $opzioni[$opzione]['costo'];
+                    $costoSpedizione *= $opzioni[$opzione]['moltiplicatore'];
+                }
             }
         }
-
-        if ( $partenza !== 'FI' && $partenza !== 'PO' ) {
+    
+        if ($partenza !== 'FI' && $partenza !== 'PO') {
             $costoSpedizione *= 1.10;
         }
-
-        echo number_format( $costoSpedizione, 2 );
+    
+        echo number_format($costoSpedizione, 2);
         wp_die();
     }
 
     public function submit_request() {
         $errors = [];
+
+        // Imposta le variabili di query
+        set_query_var('mittente', $_POST['mittente']);
+        set_query_var('destinatario', $_POST['destinatario']);
+        set_query_var('partenza', sanitize_text_field($_POST['partenza']));
+        set_query_var('destinazione', sanitize_text_field($_POST['destinazione']));
+        set_query_var('tipoSpedizione', sanitize_text_field($_POST['tipoSpedizione']));
+        set_query_var('tipoPallet', sanitize_text_field($_POST['tipoPallet']));
+        set_query_var('opzioniAggiuntive', $_POST['opzioniAggiuntive']);
+        set_query_var('costoSpedizione', sanitize_text_field($_POST['costoSpedizione']));
+
+        // Recupera le variabili di query
+        $mittente = get_query_var('mittente');
+        $destinatario = get_query_var('destinatario');
+        $partenza = get_query_var('partenza');
+        $destinazione = get_query_var('destinazione');
+        $tipoSpedizione = get_query_var('tipoSpedizione');
+        $tipoPallet = get_query_var('tipoPallet');
+        $opzioniAggiuntive = get_query_var('opzioniAggiuntive', []);
+        $costoSpedizione = get_query_var('costoSpedizione');
 
         // Check required fields
         $required_fields = [
@@ -352,7 +377,7 @@ class Shipping_Calculator_Plugin {
 
         foreach ($required_fields as $type => $fields) {
             foreach ($fields as $field_key => $field) {
-                if ($field['required'] && empty(get_query_var($type)[$field_key])) {
+                if ($field['required'] && empty($mittente[$field_key])) {
                     $errors[] = "<br/> &bull; Il campo {$field['name']} è obbligatorio.";
                 }
             }
@@ -360,7 +385,7 @@ class Shipping_Calculator_Plugin {
 
         // Validate email fields
         foreach (['mittente', 'destinatario'] as $type) {
-            if (!empty(get_query_var($type)['email']) && !filter_var(get_query_var($type)['email'], FILTER_VALIDATE_EMAIL)) {
+            if (!empty($mittente['email']) && !filter_var($mittente['email'], FILTER_VALIDATE_EMAIL)) {
                 $errors[] = "L'email del {$type} non è valida.";
             }
         }
@@ -371,14 +396,14 @@ class Shipping_Calculator_Plugin {
         } else {
             // Proceed with sending the email
             $data = [
-                'mittente' => array_map('sanitize_text_field', get_query_var('mittente')),
-                'destinatario' => array_map('sanitize_text_field', get_query_var('destinatario')),
-                'partenza' => sanitize_text_field(get_query_var('partenza')),
-                'destinazione' => sanitize_text_field(get_query_var('destinazione')),
-                'tipoSpedizione' => sanitize_text_field(get_query_var('tipoSpedizione')),
-                'tipoPallet' => sanitize_text_field(get_query_var('tipoPallet')),
-                'opzioniAggiuntive' => get_query_var('opzioniAggiuntive', []),
-                'costoSpedizione' => sanitize_text_field(get_query_var('costoSpedizione')),
+                'mittente' => array_map('sanitize_text_field', $mittente),
+                'destinatario' => array_map('sanitize_text_field', $destinatario),
+                'partenza' => sanitize_text_field($partenza),
+                'destinazione' => sanitize_text_field($destinazione),
+                'tipoSpedizione' => sanitize_text_field($tipoSpedizione),
+                'tipoPallet' => sanitize_text_field($tipoPallet),
+                'opzioniAggiuntive' => $opzioniAggiuntive,
+                'costoSpedizione' => sanitize_text_field($costoSpedizione),
             ];
 
             $opzioniAggiuntiveLabels = [
@@ -387,7 +412,7 @@ class Shipping_Calculator_Plugin {
                 'consegna_rapida' => 'Consegna rapida'
             ];
 
-            $opzioniAggiuntiveReadable = array_map(function($opzione) use ($opzioniAggiuntiveLabels) {
+            $opzioniAggiuntiveReadable = array_map(function ($opzione) use ($opzioniAggiuntiveLabels) {
                 return $opzioniAggiuntiveLabels[$opzione] ?? $opzione;
             }, $data['opzioniAggiuntive']);
 
@@ -438,10 +463,10 @@ class Shipping_Calculator_Plugin {
     }
 
     public function enqueue_scripts() {
-        wp_enqueue_style( 'shipping-calculator-css', plugin_dir_url( __FILE__ ) . 'shipping-calculator.css' );
-        wp_enqueue_style( 'select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css' );
-        wp_enqueue_script( 'shipping-calculator-js', plugin_dir_url( __FILE__ ) . 'shipping-calculator.js', [ 'jquery' ], null, true );
-        wp_enqueue_script( 'select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js', [ 'jquery' ], null, true );
+        wp_enqueue_style('shipping-calculator-css', plugin_dir_url(__FILE__) . 'shipping-calculator.css');
+        wp_enqueue_style('select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css');
+        wp_enqueue_script('shipping-calculator-js', plugin_dir_url(__FILE__) . 'shipping-calculator.js', ['jquery'], null, true);
+        wp_enqueue_script('select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js', ['jquery'], null, true);
     }
 }
 
