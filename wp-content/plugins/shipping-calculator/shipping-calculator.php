@@ -314,13 +314,10 @@ class Shipping_Calculator_Plugin {
         ];
     
         // Applica le opzioni aggiuntive se presenti
-        if (!empty($opzioniAggiuntive)) {
-            $opzioniAggiuntiveArray = explode(',', $opzioniAggiuntive);
-            foreach ($opzioniAggiuntiveArray as $opzione) {
-                if (isset($opzioni[$opzione])) {
-                    $costoSpedizione += $opzioni[$opzione]['costo'];
-                    $costoSpedizione *= $opzioni[$opzione]['moltiplicatore'];
-                }
+        foreach ($opzioniAggiuntive as $opzione) {
+            if (isset($opzioni[$opzione])) {
+                $costoSpedizione += $opzioni[$opzione]['costo'];
+                $costoSpedizione *= $opzioni[$opzione]['moltiplicatore'];
             }
         }
     
