@@ -273,8 +273,9 @@ class Shipping_Calculator_Plugin {
         $destinazione = sanitize_text_field($_POST['destinazione']);
         $tipoSpedizione = sanitize_text_field($_POST['tipoSpedizione']);
         $tipoPallet = sanitize_text_field($_POST['tipoPallet']);
+        $quantita = intval($_POST['quantita']);
         $opzioniAggiuntive = $_POST['opzioniAggiuntive'] ?? [];
-
+    
         $csv_file_path = plugin_dir_path(__FILE__) . 'tariffe_consegna.csv';
         $csv_file = fopen($csv_file_path, 'r');
         $rates = [];
@@ -296,9 +297,9 @@ class Shipping_Calculator_Plugin {
             }
             fclose($csv_file);
         }
-
-        $tariffaBase = floatval( $rates[$destinazione][$tipoSpedizione][$tipoPallet] ) ?? 0;
-        $costoSpedizione = $tariffaBase;
+    
+        $tariffaBase = floatval($rates[$destinazione][$tipoSpedizione][$tipoPallet]) ?? 0;
+        $costoSpedizione = $tariffaBase * $quantita;
     
         $opzioni = [
             'sponda_idraulica' => ['costo' => 50, 'moltiplicatore' => 1.03],
@@ -321,10 +322,11 @@ class Shipping_Calculator_Plugin {
         echo number_format($costoSpedizione, 2);
         wp_die();
     }
+    
 
     public function submit_request() {
         $errors = [];
-
+    
         // Recupera le variabili di query
         $mittente = $_POST['mittente'];
         $destinatario = $_POST['destinatario'];
@@ -332,9 +334,10 @@ class Shipping_Calculator_Plugin {
         $destinazione = sanitize_text_field($_POST['destinazione']);
         $tipoSpedizione = sanitize_text_field($_POST['tipoSpedizione']);
         $tipoPallet = sanitize_text_field($_POST['tipoPallet']);
+        $quantita = intval($_POST['quantita']);
         $opzioniAggiuntive = $_POST['opzioniAggiuntive'] ?? [];
         $costoSpedizione = sanitize_text_field($_POST['costoSpedizione']);
-
+    
         // Check required fields
         $required_fields = [
             'mittente' => [
@@ -354,7 +357,7 @@ class Shipping_Calculator_Plugin {
                 'email' => ['name' => 'Email Destinatario', 'required' => true],
             ],
         ];
-
+    
         foreach ($required_fields as $type => $fields) {
             foreach ($fields as $field_key => $field) {
                 if ($field['required'] && empty($mittente[$field_key])) {
@@ -362,14 +365,14 @@ class Shipping_Calculator_Plugin {
                 }
             }
         }
-
+    
         // Validate email fields
         foreach (['mittente', 'destinatario'] as $type) {
             if (!empty($mittente['email']) && !filter_var($mittente['email'], FILTER_VALIDATE_EMAIL)) {
                 $errors[] = "L'email del {$type} non è valida.";
             }
         }
-
+    
         // If there are errors, return them
         if (!empty($errors)) {
             wp_send_json_error(['errors' => $errors]);
@@ -382,23 +385,24 @@ class Shipping_Calculator_Plugin {
                 'destinazione' => sanitize_text_field($destinazione),
                 'tipoSpedizione' => sanitize_text_field($tipoSpedizione),
                 'tipoPallet' => sanitize_text_field($tipoPallet),
+                'quantita' => intval($quantita),
                 'opzioniAggiuntive' => $opzioniAggiuntive,
                 'costoSpedizione' => sanitize_text_field($costoSpedizione),
             ];
-
+    
             $opzioniAggiuntiveLabels = [
                 'sponda_idraulica' => 'Consegna con sponda idraulica',
                 'assicurazione' => 'Assicurazione',
                 'consegna_rapida' => 'Consegna rapida'
             ];
-
+    
             $opzioniAggiuntiveReadable = array_map(function ($opzione) use ($opzioniAggiuntiveLabels) {
                 return $opzioniAggiuntiveLabels[$opzione] ?? $opzione;
             }, $data['opzioniAggiuntive']);
-
+    
             $to = $data['mittente']['email'];
             $subject = 'Dettagli della Richiesta di Spedizione';
-
+    
             $fields_to_include = [
                 'Nominativo' => 'nome',
                 'Indirizzo' => 'indirizzo',
@@ -407,40 +411,42 @@ class Shipping_Calculator_Plugin {
                 'Cellulare' => 'telefono',
                 'Email' => 'email'
             ];
-
+    
             $body = "Mittente:\n";
             foreach ($fields_to_include as $label => $field) {
                 $body .= "$label Mittente: {$data['mittente'][$field]}\n";
             }
-
+    
             $body .= "\nDestinatario:\n";
             foreach ($fields_to_include as $label => $field) {
                 $body .= "$label Destinatario: {$data['destinatario'][$field]}\n";
             }
-
+    
             $body .= "\nRiepilogo:\n";
             $body .= "Partenza: {$data['partenza']}\n";
             $body .= "Destinazione: {$data['destinazione']}\n";
             $body .= "Tipo di Spedizione: {$data['tipoSpedizione']}\n";
             $body .= "Tipo di Pallet: {$data['tipoPallet']}\n";
-
+            $body .= "Quantità: {$data['quantita']}\n";
+    
             if (!empty($opzioniAggiuntiveReadable)) {
                 $body .= "Opzioni aggiuntive: " . implode(', ', $opzioniAggiuntiveReadable) . "\n";
             } else {
                 $body .= "Opzioni aggiuntive: Nessuna opzione aggiuntiva aggiunta\n";
             }
-
+    
             $body .= "Costo di Spedizione: €{$data['costoSpedizione']}\n";
-
+    
             $headers = ['Content-Type: text/plain; charset=UTF-8'];
             wp_mail($to, $subject, $body, $headers);
-
+    
             // Risposta JSON di successo
             wp_send_json_success();
-
+    
             wp_die();
         }
     }
+    
 
     public function enqueue_scripts() {
         wp_enqueue_style('shipping-calculator-css', plugin_dir_url(__FILE__) . 'shipping-calculator.css');

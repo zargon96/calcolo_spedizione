@@ -112,11 +112,16 @@ echo "<script>var shippingData = $json_data;</script>";
                         $description = isset($pallet_info[$palletType]['description']) ? $pallet_info[$palletType]['description'] : 'Descrizione non disponibile';
                         $image = isset($pallet_info[$palletType]['image']) ? $pallet_info[$palletType]['image'] : plugin_dir_url(__FILE__) . 'img/default.png';
                         echo "
-                        <div class='pallet-option col-md-2' data-pallet='$palletType'>
+                        <div class='pallet-option col-md-3' data-pallet='$palletType'>
                             <img src='$image' alt='$palletType'>
                             <div class='pallet-info'>
                                 <h5>$palletType</h5>
                                 <p>$description</p>
+                                <div class='quantity-container row'>
+                                    <button type='button' class='btn btn-outline-secondary decrementQuantity col-md-3'>-</button>
+                                    <input type='number' class='form-control pallet-quantity col-md-5 text-center' name='quantita[$palletType]' value='1' min='1' readonly>
+                                    <button type='button' class='btn btn-outline-secondary incrementQuantity col-md-3'>+</button>
+                                </div>
                             </div>
                         </div>";
                     }
@@ -144,18 +149,19 @@ echo "<script>var shippingData = $json_data;</script>";
                     </div>
                 </div>
             </div>
+            <div class="col-md-12">
+                <button type="button" class="btn btn-primary" id="calculateButton" disabled>Calcola tariffa</button>
+            </div>
+
+            <div class="col-md-12">
+                <div id="result"></div>
+            </div>
+            <div class="col-md-12 mt-3 ">
+                <button type="button" class="btn btn-primary" id="nextbutton" style="display: none;">avanti</button>
+            </div>
         </div>
         
-        <div class="col-md-12 text-right">
-            <button type="button" class="btn btn-primary" id="calculateButton" disabled>Calcola tariffa</button>
-        </div>
-
-        <div class="col-md-12">
-            <div id="result"></div>
-        </div>
-        <div class="col-md-12 mt-3 text-right">
-            <button type="button" class="btn btn-primary" id="nextbutton" style="display: none;">avanti</button>
-        </div>
+        
     </div>
 </form>
 

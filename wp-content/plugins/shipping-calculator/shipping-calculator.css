@@ -72,14 +72,20 @@ input[disabled] {
 }
 
 .pallet-option img {
-    max-width: 50px;
-    height: 50px;
+    max-width: 70px;
+    height: 70px;
     display: block;
     margin: 0 auto;
+
 }
 
 .pallet-option.selected {
+
     border-color: #007bff;
+}
+
+.pallet-info{
+    padding: 10px;
 }
 
 .pallet-info h5 {
@@ -91,4 +97,9 @@ input[disabled] {
     margin: 0;
     font-size: 14px;
     color: #666;
+}
+
+.pallet-quantity{
+    margin: 0 auto;
+    padding-right: 0px !important;
 }

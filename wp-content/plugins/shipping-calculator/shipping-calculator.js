@@ -443,13 +443,38 @@ jQuery(document).ready(function($) {
         'consegna_rapida': 'Consegna rapida'
     };
 
+    var previousSelectedPallet = null;
+
     $('#tipo_pallet_container').on('click', '.pallet-option', function() {
+        // Resetta la quantità del pallet precedentemente selezionato
+        if (previousSelectedPallet && previousSelectedPallet !== this) {
+            $(previousSelectedPallet).find('.pallet-quantity').val(1);
+        }
+        
         $('.pallet-option').removeClass('selected');
         $(this).addClass('selected');
         var selectedPallet = $(this).data('pallet');
         $('#tipo_pallet').val(selectedPallet);
         disableNextButton(); // Disable the "Avanti" button initially
         checkCalculateButton(); // Check the state of the calculate button
+
+        // Imposta il pallet selezionato come il precedente
+        previousSelectedPallet = this;
+    });
+
+    // Aggiungi event listener per i pulsanti di incremento e decremento
+    $('#tipo_pallet_container').on('click', '.decrementQuantity', function() {
+        var quantityInput = $(this).siblings('.pallet-quantity');
+        var currentValue = parseInt(quantityInput.val());
+        if (currentValue > 1) {
+            quantityInput.val(currentValue - 1);
+        }
+    });
+
+    $('#tipo_pallet_container').on('click', '.incrementQuantity', function() {
+        var quantityInput = $(this).siblings('.pallet-quantity');
+        var currentValue = parseInt(quantityInput.val());
+        quantityInput.val(currentValue + 1);
     });
 
     var calculateButton = $('#calculateButton');
@@ -565,6 +590,7 @@ jQuery(document).ready(function($) {
         var destinazione = destinazioneSelect.val();
         var tipoSpedizione = $('input[name="tipo_spedizione"]:checked').val();
         var tipoPallet = tipoPalletSelect.val();
+        var quantita = $(`.pallet-option[data-pallet='${tipoPallet}'] .pallet-quantity`).val();
         var opzioniAggiuntive = [];
         $('#opzioni_aggiuntive input:checked').each(function() {
             opzioniAggiuntive.push($(this).val());
@@ -577,6 +603,7 @@ jQuery(document).ready(function($) {
             destinazione: destinazione,
             tipoSpedizione: tipoSpedizione,
             tipoPallet: tipoPallet,
+            quantita: quantita,
             opzioniAggiuntive: opzioniAggiuntive
         }, function(response) {
             $('#result').text('Il costo di spedizione è: €' + response);
@@ -584,6 +611,7 @@ jQuery(document).ready(function($) {
             $('#summaryDestinazione').text(provinceMap[destinazione] || destinazione);
             $('#summaryTipoSpedizione').text(tipoSpedizione);
             $('#summaryTipoPallet').text(tipoPallet);
+            $('#summaryQuantita').text(quantita);
 
             var opzioniAggiuntiveReadable = opzioniAggiuntive.map(function(opzione) {
                 return opzioniAggiuntiveLabels[opzione] || opzione;
@@ -640,6 +668,7 @@ jQuery(document).ready(function($) {
         var destinazione = $('#destinazione').val();
         var tipoSpedizione = $('input[name="tipo_spedizione"]:checked').val();
         var tipoPallet = $('#tipo_pallet').val();
+        var quantita = $(`.pallet-option[data-pallet='${tipoPallet}'] .pallet-quantity`).val();
         var opzioniAggiuntive = [];
         $('#opzioni_aggiuntive input:checked').each(function() {
             opzioniAggiuntive.push($(this).val());
@@ -665,6 +694,7 @@ jQuery(document).ready(function($) {
             destinazione: destinazione,
             tipoSpedizione: tipoSpedizione,
             tipoPallet: tipoPallet,
+            quantita: quantita,
             opzioniAggiuntive: opzioniAggiuntive,
             costoSpedizione: costoSpedizione
         }, function(response) {
