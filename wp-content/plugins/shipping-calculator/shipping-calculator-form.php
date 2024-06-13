@@ -308,10 +308,16 @@ echo "<script>var shippingData = $json_data;</script>";
                                     <p class="card-text" id="summaryTipoSpedizione"></p>
                                 </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <strong>Tipo di Pallet:</strong>
                                     <p class="card-text" id="summaryTipoPallet"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <strong>Quantità:</strong>
+                                    <p class="card-text" id="summaryQuantita"></p>
                                 </div>
                             </div>
                             <div class="col-md-12">
