@@ -268,19 +268,12 @@ class Shipping_Calculator_Plugin {
     }
 
     public function calculate_shipping() {
-         // Imposta le variabili di query
-        set_query_var('partenza', sanitize_text_field($_POST['partenza']));
-        set_query_var('destinazione', sanitize_text_field($_POST['destinazione']));
-        set_query_var('tipoSpedizione', sanitize_text_field($_POST['tipoSpedizione']));
-        set_query_var('tipoPallet', sanitize_text_field($_POST['tipoPallet']));
-        set_query_var('opzioniAggiuntive', $_POST['opzioniAggiuntive']);
-
         // Recupera le variabili di query
-        $partenza = get_query_var('partenza');
-        $destinazione = get_query_var('destinazione');
-        $tipoSpedizione = get_query_var('tipoSpedizione');
-        $tipoPallet = get_query_var('tipoPallet');
-        $opzioniAggiuntive = get_query_var('opzioniAggiuntive', []);
+        $partenza = sanitize_text_field($_POST['partenza']);
+        $destinazione = sanitize_text_field($_POST['destinazione']);
+        $tipoSpedizione = sanitize_text_field($_POST['tipoSpedizione']);
+        $tipoPallet = sanitize_text_field($_POST['tipoPallet']);
+        $opzioniAggiuntive = $_POST['opzioniAggiuntive'] ?? [];
 
         $csv_file_path = plugin_dir_path(__FILE__) . 'tariffe_consegna.csv';
         $csv_file = fopen($csv_file_path, 'r');
@@ -332,25 +325,15 @@ class Shipping_Calculator_Plugin {
     public function submit_request() {
         $errors = [];
 
-        // Imposta le variabili di query
-        set_query_var('mittente', $_POST['mittente']);
-        set_query_var('destinatario', $_POST['destinatario']);
-        set_query_var('partenza', sanitize_text_field($_POST['partenza']));
-        set_query_var('destinazione', sanitize_text_field($_POST['destinazione']));
-        set_query_var('tipoSpedizione', sanitize_text_field($_POST['tipoSpedizione']));
-        set_query_var('tipoPallet', sanitize_text_field($_POST['tipoPallet']));
-        set_query_var('opzioniAggiuntive', $_POST['opzioniAggiuntive']);
-        set_query_var('costoSpedizione', sanitize_text_field($_POST['costoSpedizione']));
-
         // Recupera le variabili di query
-        $mittente = get_query_var('mittente');
-        $destinatario = get_query_var('destinatario');
-        $partenza = get_query_var('partenza');
-        $destinazione = get_query_var('destinazione');
-        $tipoSpedizione = get_query_var('tipoSpedizione');
-        $tipoPallet = get_query_var('tipoPallet');
-        $opzioniAggiuntive = get_query_var('opzioniAggiuntive', []);
-        $costoSpedizione = get_query_var('costoSpedizione');
+        $mittente = $_POST['mittente'];
+        $destinatario = $_POST['destinatario'];
+        $partenza = sanitize_text_field($_POST['partenza']);
+        $destinazione = sanitize_text_field($_POST['destinazione']);
+        $tipoSpedizione = sanitize_text_field($_POST['tipoSpedizione']);
+        $tipoPallet = sanitize_text_field($_POST['tipoPallet']);
+        $opzioniAggiuntive = $_POST['opzioniAggiuntive'] ?? [];
+        $costoSpedizione = sanitize_text_field($_POST['costoSpedizione']);
 
         // Check required fields
         $required_fields = [
