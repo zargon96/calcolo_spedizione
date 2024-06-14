@@ -44,7 +44,7 @@ class Shipping_Calculator_Plugin {
     }
 
     public function calculate_shipping() {
-        // Recupera le variabili di query
+        
         $partenza = sanitize_text_field($_POST['partenza']);
         $destinazione = sanitize_text_field($_POST['destinazione']);
         $tipoSpedizione = sanitize_text_field($_POST['tipoSpedizione']);
@@ -80,38 +80,28 @@ class Shipping_Calculator_Plugin {
     
         $opzioni = [
             'sponda_idraulica' => ['costo' => 50, 'moltiplicatore' => 1.03],
-            'assicurazione' => ['costo' => 20, 'moltiplicatore' => 1.02],
+            'assicurazione' => [
+                'valori' => [
+                    1000 => 1000,
+                    2000 => 2000,
+                    3000 => 3000,
+                    4000 => 4000
+                ]
+            ],
             'consegna_rapida' => ['costo' => 30, 'moltiplicatore' => 1.05],
         ];
     
         // Applica le opzioni aggiuntive se presenti
         foreach ($opzioniAggiuntive as $opzione) {
             if (isset($opzioni[$opzione])) {
-                $costoSpedizione += $opzioni[$opzione]['costo'];
-                $costoSpedizione *= $opzioni[$opzione]['moltiplicatore'];
+                if ($opzione === 'assicurazione' && $assicurazioneValore > 0) {
+                    $costoSpedizione += $opzioni[$opzione]['valori'][$assicurazioneValore] ?? 0;
+                } else {
+                    $costoSpedizione += $opzioni[$opzione]['costo'];
+                    $costoSpedizione *= $opzioni[$opzione]['moltiplicatore'];
+                }
             }
         }
-    
-        // Aggiungi il costo dell'assicurazione basato sul valore selezionato
-        if (in_array('assicurazione', $opzioniAggiuntive) && $assicurazioneValore > 0) {
-            $costoAssicurazione = 0;
-            switch ($assicurazioneValore) {
-                case 1000:
-                    $costoAssicurazione = 1000;
-                    break;
-                case 2000:
-                    $costoAssicurazione = 2000;
-                    break;
-                case 3000:
-                    $costoAssicurazione = 3000;
-                    break;
-                case 4000:
-                    $costoAssicurazione = 4000;
-                    break;
-            }
-            $costoSpedizione += $costoAssicurazione;
-        }
-
     
         if ($partenza !== 'FI' && $partenza !== 'PO') {
             $costoSpedizione *= 1.10;
@@ -121,10 +111,10 @@ class Shipping_Calculator_Plugin {
         wp_die();
     }
     
+    
     public function submit_request() {
         $errors = [];
         
-        // Recupera le variabili di query
         $mittente = $_POST['mittente'];
         $destinatario = $_POST['destinatario'];
         $partenza = sanitize_text_field($_POST['partenza']);
