@@ -479,7 +479,7 @@ jQuery(document).ready(function($) {
 
     var calculateButton = $('#calculateButton');
     var nextbutton = $('#nextbutton');
-    
+
     function checkCalculateButton() {
         var selectedPallet = $('#tipo_pallet').val();
         var selectedSpedizione = $('input[name="tipo_spedizione"]:checked').val();
@@ -552,6 +552,15 @@ jQuery(document).ready(function($) {
         $('#provincia_destinatario').val(destinazione);
     }
 
+    // Gestisce la visualizzazione del menu a tendina per i valori dell'assicurazione
+    $('#assicurazione').change(function() {
+        if ($(this).is(':checked')) {
+            $('#assicurazione_valori_container').show();
+        } else {
+            $('#assicurazione_valori_container').hide();
+        }
+    });
+
     // Disable the "Avanti" button when any select field is changed
     function disableNextButton() {
         nextbutton.prop('disabled', true);
@@ -596,6 +605,8 @@ jQuery(document).ready(function($) {
             opzioniAggiuntive.push($(this).val());
         });
 
+        var assicurazioneValore = $('#assicurazione_valori').val();
+
         // Chiamata AJAX per calcolare il costo della spedizione
         $.post('/wp-admin/admin-ajax.php', {
             action: 'calculate_shipping',
@@ -604,14 +615,15 @@ jQuery(document).ready(function($) {
             tipoSpedizione: tipoSpedizione,
             tipoPallet: tipoPallet,
             quantita: quantita,
-            opzioniAggiuntive: opzioniAggiuntive
+            opzioniAggiuntive: opzioniAggiuntive,
+            assicurazioneValore: assicurazioneValore // Aggiungi questo parametro
         }, function(response) {
             $('#result').text('Il costo di spedizione è: €' + response);
             $('#summaryPartenza').text(provinceMap[partenza] || partenza);
             $('#summaryDestinazione').text(provinceMap[destinazione] || destinazione);
             $('#summaryTipoSpedizione').text(tipoSpedizione);
             $('#summaryTipoPallet').text(tipoPallet);
-            $('#summaryQuantita').text(quantita);
+            $('#summaryQuantita').text(quantita); // Aggiungi la quantità al riepilogo
 
             var opzioniAggiuntiveReadable = opzioniAggiuntive.map(function(opzione) {
                 return opzioniAggiuntiveLabels[opzione] || opzione;
@@ -622,6 +634,9 @@ jQuery(document).ready(function($) {
             } else {
                 $('#summaryOpzioni').text('Nessuna opzione aggiuntiva aggiunta');
             }
+
+            var assicurazioneTesto = assicurazioneValore ? 'Valore Assicurazione: €' + assicurazioneValore : 'Nessuna Assicurazione';
+            $('#summaryOpzioni').append('<br>' + assicurazioneTesto);
             
             $('#summaryCosto').text('€' + response);
             $('#summary').removeClass('hidden'); // Mostra il riepilogo
@@ -674,6 +689,7 @@ jQuery(document).ready(function($) {
             opzioniAggiuntive.push($(this).val());
         });
         var costoSpedizione = $('#result').text().split('€')[1].trim();
+        var assicurazioneValore = $('#assicurazione_valori').val();
 
         // Chiamata AJAX per inviare la richiesta
         $.post('/wp-admin/admin-ajax.php', {
@@ -696,7 +712,8 @@ jQuery(document).ready(function($) {
             tipoPallet: tipoPallet,
             quantita: quantita,
             opzioniAggiuntive: opzioniAggiuntive,
-            costoSpedizione: costoSpedizione
+            costoSpedizione: costoSpedizione,
+            assicurazioneValore: assicurazioneValore
         }, function(response) {
             if (response.success) {
                 // Mostra l'avviso di successo

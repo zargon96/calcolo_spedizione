@@ -275,6 +275,7 @@ class Shipping_Calculator_Plugin {
         $tipoPallet = sanitize_text_field($_POST['tipoPallet']);
         $quantita = intval($_POST['quantita']);
         $opzioniAggiuntive = $_POST['opzioniAggiuntive'] ?? [];
+        $assicurazioneValore = intval($_POST['assicurazioneValore']);
     
         $csv_file_path = plugin_dir_path(__FILE__) . 'tariffe_consegna.csv';
         $csv_file = fopen($csv_file_path, 'r');
@@ -315,6 +316,26 @@ class Shipping_Calculator_Plugin {
             }
         }
     
+        // Aggiungi il costo dell'assicurazione basato sul valore selezionato
+        if (in_array('assicurazione', $opzioniAggiuntive)) {
+            $costoAssicurazione = 0;
+            switch ($assicurazioneValore) {
+                case 1000:
+                    $costoAssicurazione = 1000;
+                    break;
+                case 2000:
+                    $costoAssicurazione = 2000;
+                    break;
+                case 3000:
+                    $costoAssicurazione = 3000;
+                    break;
+                case 4000:
+                    $costoAssicurazione = 4000;
+                    break;
+            }
+            $costoSpedizione += $costoAssicurazione;
+        }
+    
         if ($partenza !== 'FI' && $partenza !== 'PO') {
             $costoSpedizione *= 1.10;
         }
@@ -322,6 +343,7 @@ class Shipping_Calculator_Plugin {
         echo number_format($costoSpedizione, 2);
         wp_die();
     }
+    
     
 
     public function submit_request() {
@@ -337,6 +359,7 @@ class Shipping_Calculator_Plugin {
         $quantita = intval($_POST['quantita']);
         $opzioniAggiuntive = $_POST['opzioniAggiuntive'] ?? [];
         $costoSpedizione = sanitize_text_field($_POST['costoSpedizione']);
+        $assicurazioneValore = intval($_POST['assicurazioneValore']);
     
         // Check required fields
         $required_fields = [
@@ -387,6 +410,7 @@ class Shipping_Calculator_Plugin {
                 'tipoPallet' => sanitize_text_field($tipoPallet),
                 'quantita' => intval($quantita),
                 'opzioniAggiuntive' => $opzioniAggiuntive,
+                'assicurazioneValore' => $assicurazioneValore,
                 'costoSpedizione' => sanitize_text_field($costoSpedizione),
             ];
     
@@ -435,6 +459,7 @@ class Shipping_Calculator_Plugin {
                 $body .= "Opzioni aggiuntive: Nessuna opzione aggiuntiva aggiunta\n";
             }
     
+            $body .= "Valore Assicurazione: €{$data['assicurazioneValore']}\n";
             $body .= "Costo di Spedizione: €{$data['costoSpedizione']}\n";
     
             $headers = ['Content-Type: text/plain; charset=UTF-8'];
@@ -446,6 +471,7 @@ class Shipping_Calculator_Plugin {
             wp_die();
         }
     }
+    
     
 
     public function enqueue_scripts() {

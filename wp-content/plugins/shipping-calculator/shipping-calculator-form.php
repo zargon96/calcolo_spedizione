@@ -90,18 +90,17 @@ echo "<script>var shippingData = $json_data;</script>";
             </div>
         </div>
         <div class="col-md-4">
-        <div class="form-group">
-            <label for="tipo_spedizione">Tipo di Spedizione:</label>
-            <div id="tipo_spedizione_container">
-                <label>
-                    <input type="radio" name="tipo_spedizione" value="express" checked required> Express
-                </label>
-                <label>
-                    <input type="radio" name="tipo_spedizione" value="standard" required> Standard
-                </label>
+            <div class="form-group">
+                <label for="tipo_spedizione">Tipo di Spedizione:</label>
+                <div id="tipo_spedizione_container">
+                    <label>
+                        <input type="radio" name="tipo_spedizione" value="express" checked required> Express
+                    </label>
+                    <label>
+                        <input type="radio" name="tipo_spedizione" value="standard" required> Standard
+                    </label>
+                </div>
             </div>
-        </div>
-
         </div>
         <div class="col-md-8">
             <div class="form-group pallet-container">
@@ -112,11 +111,11 @@ echo "<script>var shippingData = $json_data;</script>";
                         $description = isset($pallet_info[$palletType]['description']) ? $pallet_info[$palletType]['description'] : 'Descrizione non disponibile';
                         $image = isset($pallet_info[$palletType]['image']) ? $pallet_info[$palletType]['image'] : plugin_dir_url(__FILE__) . 'img/default.png';
                         echo "
-                        <div class='pallet-option col-md-3' data-pallet='$palletType'>
+                        <div class='pallet-option col-md-3 mt-2 mb-2 pt-2' data-pallet='$palletType'>
                             <img src='$image' alt='$palletType'>
                             <div class='pallet-info'>
                                 <h5>$palletType</h5>
-                                <p>$description</p>
+                                <p class='mb-2'>$description</p>
                                 <div class='quantity-container row'>
                                     <button type='button' class='btn btn-outline-secondary decrementQuantity col-md-3'>-</button>
                                     <input type='number' class='form-control pallet-quantity col-md-5 text-center' name='quantita[$palletType]' value='1' min='1' readonly>
@@ -130,7 +129,6 @@ echo "<script>var shippingData = $json_data;</script>";
                 <input type="hidden" name="tipo_pallet" id="tipo_pallet" required>
             </div>
         </div>
-
         <div class="col-md-4">
             <div class="form-group">
                 <label for="opzioni_aggiuntive">Opzioni aggiuntive:</label>
@@ -142,6 +140,16 @@ echo "<script>var shippingData = $json_data;</script>";
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="opzioni_aggiuntive[]" id="assicurazione" value="assicurazione">
                         <label class="form-check-label" for="assicurazione">Assicurazione</label>
+                    </div>
+                    <div id="assicurazione_valori_container" class="mt-2" style="display: none;">
+                        <label for="assicurazione_valori">Seleziona il valore dell'assicurazione:</label>
+                        <select class="form-control" id="assicurazione_valori" name="assicurazione_valori">
+                            <option value="1000">€1000</option>
+                            <option value="2000">€2000</option>
+                            <option value="3000">€3000</option>
+                            <option value="4000">€4000</option>
+                        </select>
+                        </br>
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="opzioni_aggiuntive[]" id="consegna_rapida" value="consegna_rapida">
@@ -160,8 +168,6 @@ echo "<script>var shippingData = $json_data;</script>";
                 <button type="button" class="btn btn-primary" id="nextbutton" style="display: none;">avanti</button>
             </div>
         </div>
-        
-        
     </div>
 </form>
 
@@ -343,3 +349,4 @@ echo "<script>var shippingData = $json_data;</script>";
     </div>
     <div id="requestResult"></div>
 </form>
+

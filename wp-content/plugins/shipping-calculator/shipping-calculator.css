@@ -64,23 +64,18 @@ input[disabled] {
     border: 2px solid transparent;
     border-radius: 5px;
     cursor: pointer;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    margin-left: 18px; 
     text-align: center !important;
     transition: border-color 0.3s;
 }
 
 .pallet-option img {
-    max-width: 70px;
-    height: 70px;
+    max-width: 80px;
+    height: 80px;
     display: block;
     margin: 0 auto;
-
 }
 
 .pallet-option.selected {
-
     border-color: #007bff;
 }
 
@@ -102,4 +97,25 @@ input[disabled] {
 .pallet-quantity{
     margin: 0 auto;
     padding-right: 0px !important;
+}
+
+/* Extra small devices (phones, less than 480px) */
+@media (max-width: 480px) {
+    .btn:not(:disabled):not(.disabled) {
+        cursor: pointer;
+        width: 100%
+    }
+
+    .pallet-quantity{
+        margin: 0 auto;
+        padding-right: 13px !important;
+    }
+
+    .quantity-container {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        gap: 25px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
 }
