@@ -12,9 +12,7 @@ if (!defined('ABSPATH')) {
 
 class Shipping_Calculator_Plugin {
     public function __construct() {
-        // filtro per le variabili di query
-        add_filter('query_vars', [$this, 'custom_query_vars']);
-
+        
         // shortcode
         add_shortcode('shipping_calculator', [$this, 'render_shortcode']);
 
@@ -28,23 +26,10 @@ class Shipping_Calculator_Plugin {
         add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
     }
 
-    public function custom_query_vars($vars) {
-        $vars[] = 'success';
-        $vars[] = 'partenza';
-        $vars[] = 'destinazione';
-        $vars[] = 'tipoSpedizione';
-        $vars[] = 'tipoPallet';
-        $vars[] = 'opzioniAggiuntive';
-        $vars[] = 'mittente';
-        $vars[] = 'destinatario';
-        $vars[] = 'costoSpedizione';
-        return $vars;
-    }
-
     public function render_shortcode() {
         ob_start();
         echo '<div id="alertContainer">';
-        if (get_query_var('success', '') == 1) {
+        if ('success' == 1) {
             echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
                     Richiesta inviata con successo.
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -108,7 +93,7 @@ class Shipping_Calculator_Plugin {
         }
     
         // Aggiungi il costo dell'assicurazione basato sul valore selezionato
-        if (in_array('assicurazione', $opzioniAggiuntive)) {
+        if (in_array('assicurazione', $opzioniAggiuntive) && $assicurazioneValore > 0) {
             $costoAssicurazione = 0;
             switch ($assicurazioneValore) {
                 case 1000:
@@ -126,6 +111,7 @@ class Shipping_Calculator_Plugin {
             }
             $costoSpedizione += $costoAssicurazione;
         }
+
     
         if ($partenza !== 'FI' && $partenza !== 'PO') {
             $costoSpedizione *= 1.10;
@@ -135,11 +121,9 @@ class Shipping_Calculator_Plugin {
         wp_die();
     }
     
-    
-
     public function submit_request() {
         $errors = [];
-    
+        
         // Recupera le variabili di query
         $mittente = $_POST['mittente'];
         $destinatario = $_POST['destinatario'];
@@ -151,7 +135,7 @@ class Shipping_Calculator_Plugin {
         $opzioniAggiuntive = $_POST['opzioniAggiuntive'] ?? [];
         $costoSpedizione = sanitize_text_field($_POST['costoSpedizione']);
         $assicurazioneValore = intval($_POST['assicurazioneValore']);
-    
+        
         // Check required fields
         $required_fields = [
             'mittente' => [
@@ -171,7 +155,7 @@ class Shipping_Calculator_Plugin {
                 'email' => ['name' => 'Email Destinatario', 'required' => true],
             ],
         ];
-    
+        
         foreach ($required_fields as $type => $fields) {
             foreach ($fields as $field_key => $field) {
                 if ($field['required'] && empty($mittente[$field_key])) {
@@ -179,14 +163,14 @@ class Shipping_Calculator_Plugin {
                 }
             }
         }
-    
+        
         // Validate email fields
         foreach (['mittente', 'destinatario'] as $type) {
             if (!empty($mittente['email']) && !filter_var($mittente['email'], FILTER_VALIDATE_EMAIL)) {
                 $errors[] = "L'email del {$type} non è valida.";
             }
         }
-    
+        
         // If there are errors, return them
         if (!empty($errors)) {
             wp_send_json_error(['errors' => $errors]);
@@ -204,20 +188,20 @@ class Shipping_Calculator_Plugin {
                 'assicurazioneValore' => $assicurazioneValore,
                 'costoSpedizione' => sanitize_text_field($costoSpedizione),
             ];
-    
+        
             $opzioniAggiuntiveLabels = [
                 'sponda_idraulica' => 'Consegna con sponda idraulica',
                 'assicurazione' => 'Assicurazione',
                 'consegna_rapida' => 'Consegna rapida'
             ];
-    
+        
             $opzioniAggiuntiveReadable = array_map(function ($opzione) use ($opzioniAggiuntiveLabels) {
                 return $opzioniAggiuntiveLabels[$opzione] ?? $opzione;
             }, $data['opzioniAggiuntive']);
-    
-            $to = $data['mittente']['email'];
+        
+            $to = [$data['mittente']['email'], $data['destinatario']['email']];
             $subject = 'Dettagli della Richiesta di Spedizione';
-    
+        
             $fields_to_include = [
                 'Nominativo' => 'nome',
                 'Indirizzo' => 'indirizzo',
@@ -226,45 +210,46 @@ class Shipping_Calculator_Plugin {
                 'Cellulare' => 'telefono',
                 'Email' => 'email'
             ];
-    
+        
             $body = "Mittente:\n";
             foreach ($fields_to_include as $label => $field) {
                 $body .= "$label Mittente: {$data['mittente'][$field]}\n";
             }
-    
+        
             $body .= "\nDestinatario:\n";
             foreach ($fields_to_include as $label => $field) {
                 $body .= "$label Destinatario: {$data['destinatario'][$field]}\n";
             }
-    
+        
             $body .= "\nRiepilogo:\n";
             $body .= "Partenza: {$data['partenza']}\n";
             $body .= "Destinazione: {$data['destinazione']}\n";
             $body .= "Tipo di Spedizione: {$data['tipoSpedizione']}\n";
             $body .= "Tipo di Pallet: {$data['tipoPallet']}\n";
             $body .= "Quantità: {$data['quantita']}\n";
-    
+        
             if (!empty($opzioniAggiuntiveReadable)) {
                 $body .= "Opzioni aggiuntive: " . implode(', ', $opzioniAggiuntiveReadable) . "\n";
             } else {
                 $body .= "Opzioni aggiuntive: Nessuna opzione aggiuntiva aggiunta\n";
             }
-    
-            $body .= "Valore Assicurazione: €{$data['assicurazioneValore']}\n";
+        
+            if (in_array('assicurazione', $data['opzioniAggiuntive']) && $data['assicurazioneValore'] > 0) {
+                $body .= "Valore Assicurazione: €{$data['assicurazioneValore']}\n";
+            }
+        
             $body .= "Costo di Spedizione: €{$data['costoSpedizione']}\n";
-    
+        
             $headers = ['Content-Type: text/plain; charset=UTF-8'];
             wp_mail($to, $subject, $body, $headers);
-    
+        
             // Risposta JSON di successo
             wp_send_json_success();
-    
+        
             wp_die();
         }
     }
     
-    
-
     public function enqueue_scripts() {
         wp_enqueue_style('shipping-calculator-css', plugin_dir_url(__FILE__) . 'shipping-calculator.css');
         wp_enqueue_style('select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css');

@@ -334,8 +334,10 @@ jQuery(document).ready(function($) {
                 $('#summaryOpzioni').text('Nessuna opzione aggiuntiva aggiunta');
             }
 
-            var assicurazioneTesto = assicurazioneValore ? 'Valore Assicurazione: €' + assicurazioneValore : 'Nessuna Assicurazione';
-            $('#summaryOpzioni').append('<br>' + assicurazioneTesto);
+            // Aggiungi il valore dell'assicurazione solo se selezionato
+            if (opzioniAggiuntive.includes('assicurazione') && assicurazioneValore) {
+                $('#summaryOpzioni').append('<br>Valore Assicurazione: €' + assicurazioneValore);
+            }
             
             $('#summaryCosto').text('€' + response);
             $('#summary').removeClass('hidden'); // Mostra il riepilogo
