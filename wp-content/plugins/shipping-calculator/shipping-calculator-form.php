@@ -280,7 +280,7 @@ echo "<script>var shippingData = $json_data;</script>";
                         </form>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row riga-mobile">
                     <div class="col-md-6">
                         <button type="button" class="btn btn-secondary backButton" >Indietro</button>
                     </div>

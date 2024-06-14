@@ -112,10 +112,17 @@ input[disabled] {
     }
 
     .quantity-container {
-        display: flex !important;
         flex-wrap: nowrap !important;
         gap: 25px;
         padding-top: 10px;
         padding-bottom: 10px;
+    }
+
+    .card.text-center.sticky-top {
+        margin-top: 20px !important;
+    }
+
+    .riga-mobile{    
+        flex-wrap: nowrap !important;
     }
 }

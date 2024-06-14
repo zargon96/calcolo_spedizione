@@ -331,7 +331,7 @@ jQuery(document).ready(function($) {
             if (opzioniAggiuntiveReadable.length > 0) {
                 $('#summaryOpzioni').text(opzioniAggiuntiveReadable.join(', '));
             } else {
-                $('#summaryOpzioni').text('Nessuna opzione aggiuntiva aggiunta');
+                $('#summaryOpzioni').text('Nessuna opzione aggiuntiva');
             }
 
             // Aggiungi il valore dell'assicurazione solo se selezionato
