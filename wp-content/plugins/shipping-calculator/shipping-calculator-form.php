@@ -69,39 +69,6 @@ echo "<script>var shippingData = $json_data;</script>";
 
 <form id="spedizioneForm" class="container">
     <div class="row">
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="partenza">Partenza:</label>
-                <select name="partenza" class="form-control js-example-tags" id="partenza" data-calc="true" required>
-                    <?php foreach ( $provinces as $province ) {
-                        echo "<option value='$province'>$province</option>";
-                    } ?>
-                </select>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="destinazione">Destinazione:</label>
-                <select name="destinazione" class="form-control js-example-tags" id="destinazione" data-calc="true" required>
-                    <?php foreach ( $provinces as $province ) {
-                        echo "<option value='$province'>$province</option>";
-                    } ?>
-                </select>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="tipo_spedizione">Tipo di Spedizione:</label>
-                <div id="tipo_spedizione_container">
-                    <label>
-                        <input type="radio" name="tipo_spedizione" value="express" checked required> Express
-                    </label>
-                    <label>
-                        <input type="radio" name="tipo_spedizione" value="standard" required> Standard
-                    </label>
-                </div>
-            </div>
-        </div>
         <div class="col-md-8">
             <div class="form-group pallet-container">
                 <label for="tipo_pallet">Seleziona la tipologia di Pallet:</label>
@@ -130,6 +97,45 @@ echo "<script>var shippingData = $json_data;</script>";
             </div>
         </div>
         <div class="col-md-4">
+            <div class="row riga-mobile">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="partenza">Partenza:</label>
+                        <select name="partenza" class="form-control js-example-tags" id="partenza" data-calc="true" required>
+                            <?php foreach ( $provinces as $province ) {
+                                echo "<option value='$province'>$province</option>";
+                            } ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="destinazione">Destinazione:</label>
+                        <select name="destinazione" class="form-control js-example-tags" id="destinazione" data-calc="true" required>
+                            <?php foreach ( $provinces as $province ) {
+                                echo "<option value='$province'>$province</option>";
+                            } ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="tipo_spedizione">Tipo di Spedizione:</label>
+                <div id="tipo_spedizione_container">
+                    <div class="row riga-mobile">
+                        <div class="col-md-6">
+                            <label>
+                                <input type="radio" name="tipo_spedizione" value="express" checked required> Express
+                            </label>
+                        </div>
+                        <div class="col-md-6">
+                            <label>
+                                <input type="radio" name="tipo_spedizione" value="standard" required> Standard
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="form-group">
                 <label for="opzioni_aggiuntive">Opzioni aggiuntive:</label>
                 <div id="opzioni_aggiuntive">
