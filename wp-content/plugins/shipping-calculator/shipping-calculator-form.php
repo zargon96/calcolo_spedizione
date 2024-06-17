@@ -82,7 +82,7 @@ echo "<script>var shippingData = $json_data;</script>";
                             <img src='$image' alt='$palletType'>
                             <div class='pallet-info'>
                                 <h5>$palletType</h5>
-                                <p class='mb-2'>$description</p>
+                                <p class='mb-2 text-wrap overflow-hidden'>$description</p>
                                 <div class='quantity-container row'>
                                     <button type='button' class='btn btn-outline-secondary decrementQuantity col-md-3'>-</button>
                                     <input type='number' class='form-control pallet-quantity col-md-5 text-center' name='quantita[$palletType]' value='1' min='1' readonly>
