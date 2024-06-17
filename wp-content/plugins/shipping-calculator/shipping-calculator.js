@@ -489,4 +489,3 @@ jQuery(document).ready(function($) {
         }
     });
 });
-
