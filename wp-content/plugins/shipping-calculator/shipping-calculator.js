@@ -480,5 +480,13 @@ jQuery(document).ready(function($) {
         $(fields.map(field => `#${field.replace(/\[/g, '\\[').replace(/\]/g, '\\]')}`).join(',')).each(function() {
             validateField(this);
         });
+
+        // Se ci sono errori nei campi, non inviare il form
+        var form = $('#spedizioneForm')[0];
+        if (!form.checkValidity()) {
+            alert('Per favore, compila tutti i campi obbligatori.');
+            return;
+        }
     });
 });
+
