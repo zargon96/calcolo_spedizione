@@ -150,10 +150,10 @@ echo "<script>var shippingData = $json_data;</script>";
                     <div id="assicurazione_valori_container" class="mt-2" style="display: none;">
                         <label for="assicurazione_valori">Seleziona il valore dell'assicurazione:</label>
                         <select class="form-control" id="assicurazione_valori" name="assicurazione_valori">
-                            <option value="1000">€1000</option>
-                            <option value="2000">€2000</option>
-                            <option value="3000">€3000</option>
-                            <option value="4000">€4000</option>
+                            <option value="1000">1000€</option>
+                            <option value="2000">2000€</option>
+                            <option value="3000">3000€</option>
+                            <option value="4000">4000€</option>
                         </select>
                         </br>
                     </div>
