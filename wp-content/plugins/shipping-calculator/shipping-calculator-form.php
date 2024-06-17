@@ -69,9 +69,34 @@ echo "<script>var shippingData = $json_data;</script>";
 
 <form id="spedizioneForm" class="container">
     <div class="row">
+        <div class="col-md-12 mb-3">
+            <h4>Partenza e Destinazione:</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="partenza">Partenza:</label>
+                            <select name="partenza" class="form-control js-example-tags" id="partenza" data-calc="true" required>
+                                <?php foreach ( $provinces as $province ) {
+                                    echo "<option value='$province'>$province</option>";
+                                } ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="destinazione">Destinazione:</label>
+                            <select name="destinazione" class="form-control js-example-tags" id="destinazione" data-calc="true" required>
+                                <?php foreach ( $provinces as $province ) {
+                                    echo "<option value='$province'>$province</option>";
+                                } ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+        </div>
         <div class="col-md-8">
             <div class="form-group pallet-container">
-                <label for="tipo_pallet">Seleziona la tipologia di Pallet:</label>
+                <h4>Seleziona la tipologia di Pallet:</h4>
                 <div id="tipo_pallet_container" class="row">
                     <?php
                     foreach ($pallet_types as $palletType) {
@@ -97,30 +122,8 @@ echo "<script>var shippingData = $json_data;</script>";
             </div>
         </div>
         <div class="col-md-4">
-            <div class="row riga-mobile">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="partenza">Partenza:</label>
-                        <select name="partenza" class="form-control js-example-tags" id="partenza" data-calc="true" required>
-                            <?php foreach ( $provinces as $province ) {
-                                echo "<option value='$province'>$province</option>";
-                            } ?>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="destinazione">Destinazione:</label>
-                        <select name="destinazione" class="form-control js-example-tags" id="destinazione" data-calc="true" required>
-                            <?php foreach ( $provinces as $province ) {
-                                echo "<option value='$province'>$province</option>";
-                            } ?>
-                        </select>
-                    </div>
-                </div>
-            </div>
             <div class="form-group">
-                <label for="tipo_spedizione">Tipo di Spedizione:</label>
+                <h4>Tipo di Spedizione:</h4>
                 <div id="tipo_spedizione_container">
                     <div class="row riga-mobile">
                         <div class="col-md-6">
@@ -137,7 +140,7 @@ echo "<script>var shippingData = $json_data;</script>";
                 </div>
             </div>
             <div class="form-group">
-                <label for="opzioni_aggiuntive">Opzioni aggiuntive:</label>
+                <h4>Opzioni aggiuntive:</h4>
                 <div id="opzioni_aggiuntive">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="opzioni_aggiuntive[]" id="sponda_idraulica" value="sponda_idraulica">
