@@ -70,7 +70,7 @@ echo "<script>var shippingData = $json_data;</script>";
 <form id="spedizioneForm" class="container">
     <div class="row">
         <div class="col-md-12 mb-3">
-            <h4>Partenza e Destinazione:</h4>
+            <h4>Seleziona la Partenza e Destinazione:</h4>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
