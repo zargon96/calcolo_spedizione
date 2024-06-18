@@ -71,28 +71,28 @@ echo "<script>var shippingData = $json_data;</script>";
     <div class="row">
         <div class="col-md-12 mb-3">
             <h4>Seleziona la Partenza e Destinazione:</h4>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="partenza">Partenza:</label>
-                            <select name="partenza" class="form-control js-example-tags" id="partenza" data-calc="true" required>
-                                <?php foreach ( $provinces as $province ) {
-                                    echo "<option value='$province'>$province</option>";
-                                } ?>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="destinazione">Destinazione:</label>
-                            <select name="destinazione" class="form-control js-example-tags" id="destinazione" data-calc="true" required>
-                                <?php foreach ( $provinces as $province ) {
-                                    echo "<option value='$province'>$province</option>";
-                                } ?>
-                            </select>
-                        </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="partenza">Partenza:</label>
+                        <select name="partenza" class="form-control js-example-tags" id="partenza" data-calc="true" required>
+                            <?php foreach ($provinces as $province) {
+                                echo "<option value='$province'>$province</option>";
+                            } ?>
+                        </select>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="destinazione">Destinazione:</label>
+                        <select name="destinazione" class="form-control js-example-tags" id="destinazione" data-calc="true" required>
+                            <?php foreach ($provinces as $province) {
+                                echo "<option value='$province'>$province</option>";
+                            } ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-md-8">
             <div class="form-group pallet-container">
@@ -151,30 +151,33 @@ echo "<script>var shippingData = $json_data;</script>";
                         <label class="form-check-label" for="assicurazione">Assicurazione</label>
                     </div>
                     <div id="assicurazione_valori_container" class="mt-2" style="display: none;">
-                        <label for="assicurazione_valori">Seleziona il valore dell'assicurazione:</label>
-                        <select class="form-control" id="assicurazione_valori" name="assicurazione_valori">
-                            <option value="1000">1000€</option>
-                            <option value="2000">2000€</option>
-                            <option value="3000">3000€</option>
-                            <option value="4000">4000€</option>
-                        </select>
+                        <label for="assicurazione_valori">Inserisci il valore dell'assicurazione:</label>
+                        <p class="help-block" >
+						    (Minimo 500 euro)
+						</p>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">€</span>
+                            </div>
+                            <input type="number" class="form-control" id="assicurazione_valori" name="assicurazione_valori" min="500" required>
+                            <div class="invalid-feedback" id="assicurazione_valore_invalid_feedback"></div>
+                        </div>
                         </br>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="opzioni_aggiuntive[]" id="consegna_rapida" value="consegna_rapida">
-                        <label class="form-check-label" for="consegna_rapida">Consegna rapida</label>
+                        <input class="form-check-input" type="checkbox" name="opzioni_aggiuntive[]" id="contrassegno" value="contrassegno">
+                        <label class="form-check-label" for="contrassegno">Contrassegno</label>
                     </div>
                 </div>
             </div>
             <div class="col-md-12">
                 <button type="button" class="btn btn-primary" id="calculateButton" disabled>Calcola tariffa</button>
             </div>
-
             <div class="col-md-12">
                 <div id="result"></div>
             </div>
-            <div class="col-md-12 mt-3 ">
-                <button type="button" class="btn btn-primary" id="nextbutton" style="display: none;">avanti</button>
+            <div class="col-md-12 mt-3">
+                <button type="button" class="btn btn-primary" id="nextbutton" style="display: none;">Avanti</button>
             </div>
         </div>
     </div>
@@ -184,7 +187,6 @@ echo "<script>var shippingData = $json_data;</script>";
     <div id="datiPersonali" class="hidden">
         <div class="row">
             <div class="col-md-8">
-                <!-- Dati Personali Mittente -->
                 <div class="card mb-4">
                     <div class="card-body">
                         <h5 class="card-title">Dati Personali - Mittente</h5>
@@ -236,8 +238,6 @@ echo "<script>var shippingData = $json_data;</script>";
                         </form>
                     </div>
                 </div>
-
-                <!-- Dati Personali Destinatario -->
                 <div class="card mb-4">
                     <div class="card-body">
                         <h5 class="card-title">Dati Personali - Destinatario</h5>
@@ -291,16 +291,14 @@ echo "<script>var shippingData = $json_data;</script>";
                 </div>
                 <div class="row riga-mobile">
                     <div class="col-md-6">
-                        <button type="button" class="btn btn-secondary backButton" >Indietro</button>
+                        <button type="button" class="btn btn-secondary backButton">Indietro</button>
                     </div>
                     <div class="col-md-6 text-right">
                         <button type="button" class="btn btn-success" id="submitButton">Invia richiesta</button>
                     </div>
                 </div>
             </div>
-            
             <div class="col-md-4">
-                <!-- Riepilogo Spedizione -->
                 <div class="card text-center sticky-top">
                     <div class="card-body">
                         <h5 class="card-title">Riepilogo Spedizione</h5>
@@ -358,4 +356,5 @@ echo "<script>var shippingData = $json_data;</script>";
     </div>
     <div id="requestResult"></div>
 </form>
+
 

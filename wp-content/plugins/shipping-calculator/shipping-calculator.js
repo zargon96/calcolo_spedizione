@@ -139,15 +139,16 @@ jQuery(document).ready(function($) {
     var opzioniAggiuntiveLabels = {
         'sponda_idraulica': 'Consegna con sponda idraulica',
         'assicurazione': 'Assicurazione',
-        'consegna_rapida': 'Consegna rapida'
+        'contrassegno': 'Contrassegno'
     };
 
     var previousSelectedPallet = null;
 
     $('#tipo_pallet_container').on('click', '.pallet-option', function() {
-        // Resetta la quantità del pallet precedentemente selezionato
+        // Resetta la quantità del pallet precedentemente selezionato e nasconde la quantità
         if (previousSelectedPallet && previousSelectedPallet !== this) {
             $(previousSelectedPallet).find('.pallet-quantity').val(1);
+            $(previousSelectedPallet).find('.quantity-container').hide();
         }
         
         $('.pallet-option').removeClass('selected');
@@ -157,9 +158,15 @@ jQuery(document).ready(function($) {
         disableNextButton(); // Disable the "Avanti" button initially
         checkCalculateButton(); // Check the state of the calculate button
 
+        // Mostra la quantità del pallet selezionato
+        $(this).find('.quantity-container').show();
+
         // Imposta il pallet selezionato come il precedente
         previousSelectedPallet = this;
     });
+
+    // Nascondi tutte le quantità all'inizio
+    $('.quantity-container').hide();
 
     // Aggiungi event listener per i pulsanti di incremento e decremento
     $('#tipo_pallet_container').on('click', '.decrementQuantity', function() {
@@ -293,18 +300,43 @@ jQuery(document).ready(function($) {
     updateProvince();
     checkCalculateButton();
 
+    $('#assicurazione').change(function() {
+        if ($(this).is(':checked')) {
+            $('#assicurazione_valori_container').show();
+        } else {
+            $('#assicurazione_valori_container').hide();
+            $('#assicurazione_valori').val(''); // Resetta il valore
+            $('#assicurazione_valori').removeClass('is-invalid');
+        }
+    });
+
     calculateButton.click(function() {
         var partenza = partenzaSelect.val();
         var destinazione = destinazioneSelect.val();
         var tipoSpedizione = $('input[name="tipo_spedizione"]:checked').val();
         var tipoPallet = tipoPalletSelect.val();
         var quantita = $(`.pallet-option[data-pallet='${tipoPallet}'] .pallet-quantity`).val();
+        
+
+        var assicurazioneValore = $('#assicurazione_valori').val();
         var opzioniAggiuntive = [];
         $('#opzioni_aggiuntive input:checked').each(function() {
             opzioniAggiuntive.push($(this).val());
         });
 
-        var assicurazioneValore = $('#assicurazione_valori').val();
+        if (opzioniAggiuntive.includes('assicurazione')) {
+            if (!assicurazioneValore) {
+                $('#assicurazione_valori').addClass('is-invalid');
+                $('#assicurazione_valore_invalid_feedback').text('ATTENZIONE: Il valore dell\'assicurazione non può essere vuoto.');
+                return;
+            } else if (assicurazioneValore < 500) {
+                $('#assicurazione_valori').addClass('is-invalid');
+                $('#assicurazione_valore_invalid_feedback').text('ATTENZIONE: Il valore dell\'assicurazione non può essere inferiore a 500 euro.');
+                return;
+            } else {
+                $('#assicurazione_valori').removeClass('is-invalid');
+            }
+        }
 
         // Chiamata AJAX per calcolare il costo della spedizione
         $.post('/wp-admin/admin-ajax.php', {
@@ -348,18 +380,32 @@ jQuery(document).ready(function($) {
         });
     });
 
+    function resetFormValidation() {
+        // Rimuove le classi di errore e i messaggi di errore dai campi del form
+        $(fields.map(field => `#${field.replace(/\[/g, '\\[').replace(/\]/g, '\\]')}`).join(',')).each(function() {
+            $(this).removeClass('is-invalid');
+            $(this).removeClass('is-valid');
+        });
+    }
+
     nextbutton.click(function() {
         $('#spedizioneForm').hide();
         datiPersonaliDiv.show(); // Mostra i campi dei dati anagrafici
     });
 
-    backButton.click(function() { 
+    backButton.click(function() {
+        resetFormValidation();
         datiPersonaliDiv.hide();
         $('#spedizioneForm').show(); // Mostra il modulo di spedizione
         disableNextButton(); // Disable the "Avanti" button when going back
     });
 
     submitButton.click(function() {
+        $(fields.map(field => `#${field.replace(/\[/g, '\\[').replace(/\]/g, '\\]')}`).join(',')).each(function() {
+            validateField(this);
+        });
+
+        // Se ci sono errori nei campi, non inviare il form
         var form = $('#spedizioneForm')[0];
         if (!form.checkValidity()) {
             alert('Per favore, compila tutti i campi obbligatori.');
@@ -489,3 +535,6 @@ jQuery(document).ready(function($) {
         }
     });
 });
+
+
+

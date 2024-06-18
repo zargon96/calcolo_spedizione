@@ -12,17 +12,11 @@ if (!defined('ABSPATH')) {
 
 class Shipping_Calculator_Plugin {
     public function __construct() {
-        
-        // shortcode
         add_shortcode('shipping_calculator', [$this, 'render_shortcode']);
-
-        // AJAX
         add_action('wp_ajax_calculate_shipping', [$this, 'calculate_shipping']);
         add_action('wp_ajax_nopriv_calculate_shipping', [$this, 'calculate_shipping']);
         add_action('wp_ajax_submit_request', [$this, 'submit_request']);
         add_action('wp_ajax_nopriv_submit_request', [$this, 'submit_request']);
-
-        // scripts e stili
         add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
     }
 
@@ -37,14 +31,11 @@ class Shipping_Calculator_Plugin {
                     </button>
                   </div>';
         }
-
         include plugin_dir_path(__FILE__) . 'shipping-calculator-form.php';
-
         return ob_get_clean();
     }
 
     public function calculate_shipping() {
-        
         $partenza = sanitize_text_field($_POST['partenza']);
         $destinazione = sanitize_text_field($_POST['destinazione']);
         $tipoSpedizione = sanitize_text_field($_POST['tipoSpedizione']);
@@ -79,34 +70,28 @@ class Shipping_Calculator_Plugin {
         $costoSpedizione = $tariffaBase * $quantita;
     
         $opzioni = [
-            'sponda_idraulica' => ['costo' => 50, 'moltiplicatore' => 1.03],
-            'assicurazione' => [
-                'valori' => [
-                    1000 => 1000,
-                    2000 => 2000,
-                    3000 => 3000,
-                    4000 => 4000
-                ]
-            ],
-            'consegna_rapida' => ['costo' => 30, 'moltiplicatore' => 1.05],
+            'sponda_idraulica' => ['costo' => 50, 'moltiplicatore' => 1.03, 'moltiplicatore_valore' => false],
+            'assicurazione' => ['moltiplicatore' => 1.02, 'moltiplicatore_valore' => true],
+            'contrassegno' => ['costo' => 10, 'moltiplicatore' => 1.02, 'moltiplicatore_valore' => false],
         ];
-    
+        
         // Applica le opzioni aggiuntive se presenti
         foreach ($opzioniAggiuntive as $opzione) {
             if (isset($opzioni[$opzione])) {
                 if ($opzione === 'assicurazione' && $assicurazioneValore > 0) {
-                    $costoSpedizione += $opzioni[$opzione]['valori'][$assicurazioneValore] ?? 0;
+                    $assicurazioneValore;
                 } else {
                     $costoSpedizione += $opzioni[$opzione]['costo'];
                     $costoSpedizione *= $opzioni[$opzione]['moltiplicatore'];
                 }
             }
         }
-    
+        
+        // Non includere il valore dell'assicurazione nel costo totale
         if ($partenza !== 'FI' && $partenza !== 'PO') {
             $costoSpedizione *= 1.10;
         }
-    
+        
         echo number_format($costoSpedizione, 2);
         wp_die();
     }
@@ -183,16 +168,16 @@ class Shipping_Calculator_Plugin {
             $opzioniAggiuntiveLabels = [
                 'sponda_idraulica' => 'Consegna con sponda idraulica',
                 'assicurazione' => 'Assicurazione',
-                'consegna_rapida' => 'Consegna rapida'
+                'contrassegno' => 'Contrassegno'
             ];
-    
+            
             $opzioniAggiuntiveReadable = array_map(function ($opzione) use ($opzioniAggiuntiveLabels) {
                 return $opzioniAggiuntiveLabels[$opzione] ?? $opzione;
             }, $data['opzioniAggiuntive']);
-    
+            
             $to = [$data['mittente']['email'], $data['destinatario']['email']];
             $subject = 'Dettagli della Richiesta di Spedizione';
-    
+            
             $fields_to_include = [
                 'Nominativo' => 'nome',
                 'Indirizzo' => 'indirizzo',
@@ -201,46 +186,43 @@ class Shipping_Calculator_Plugin {
                 'Cellulare' => 'telefono',
                 'Email' => 'email'
             ];
-    
+            
             $body = "Mittente:\n";
             foreach ($fields_to_include as $label => $field) {
                 $body .= "$label Mittente: {$data['mittente'][$field]}\n";
             }
-    
+            
             $body .= "\nDestinatario:\n";
             foreach ($fields_to_include as $label => $field) {
                 $body .= "$label Destinatario: {$data['destinatario'][$field]}\n";
             }
-    
+            
             $body .= "\nRiepilogo:\n";
             $body .= "Partenza: {$data['partenza']}\n";
             $body .= "Destinazione: {$data['destinazione']}\n";
             $body .= "Tipo di Spedizione: {$data['tipoSpedizione']}\n";
             $body .= "Tipo di Pallet: {$data['tipoPallet']}\n";
             $body .= "Quantità: {$data['quantita']}\n";
-    
+            
             if (!empty($opzioniAggiuntiveReadable)) {
                 $body .= "Opzioni aggiuntive: " . implode(', ', $opzioniAggiuntiveReadable) . "\n";
             } else {
-                $body .= "Opzioni aggiuntive: Nessuna opzione aggiuntiva aggiunta\n";
+                $body .= "Opzioni aggiuntive: Nessuna opzione aggiuntiva\n";
             }
-    
+            
             if (in_array('assicurazione', $data['opzioniAggiuntive']) && $data['assicurazioneValore'] > 0) {
                 $body .= "Valore Assicurazione: €{$data['assicurazioneValore']}\n";
             }
-    
+            
             $body .= "Costo di Spedizione: €{$data['costoSpedizione']}\n";
-    
+            
             $headers = ['Content-Type: text/plain; charset=UTF-8'];
             wp_mail($to, $subject, $body, $headers);
-    
-            // Risposta JSON di successo
+            
             wp_send_json_success();
-    
             wp_die();
         }
     }
-    
     
     public function enqueue_scripts() {
         wp_enqueue_style('shipping-calculator-css', plugin_dir_url(__FILE__) . 'shipping-calculator.css');
@@ -251,5 +233,4 @@ class Shipping_Calculator_Plugin {
 }
 
 new Shipping_Calculator_Plugin();
-
 

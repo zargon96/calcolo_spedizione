@@ -110,6 +110,12 @@ input[disabled] {
     line-height: 33px !important;
 }
 
+.help-block {
+    opacity: 0.6; 
+    font-size: 13px; 
+    color: #6c757d; 
+}
+
 /* Extra small devices (phones, less than 480px) */
 @media (max-width: 480px) {
     .btn:not(:disabled):not(.disabled) {
