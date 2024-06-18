@@ -347,14 +347,14 @@ jQuery(document).ready(function($) {
             tipoPallet: tipoPallet,
             quantita: quantita,
             opzioniAggiuntive: opzioniAggiuntive,
-            assicurazioneValore: assicurazioneValore // Aggiungi questo parametro
+            assicurazioneValore: assicurazioneValore
         }, function(response) {
             $('#result').text('Il costo di spedizione è: €' + response);
             $('#summaryPartenza').text(provinceMap[partenza] || partenza);
             $('#summaryDestinazione').text(provinceMap[destinazione] || destinazione);
             $('#summaryTipoSpedizione').text(tipoSpedizione);
             $('#summaryTipoPallet').text(tipoPallet);
-            $('#summaryQuantita').text(quantita); // Aggiungi la quantità al riepilogo
+            $('#summaryQuantita').text(quantita);
 
             var opzioniAggiuntiveReadable = opzioniAggiuntive.map(function(opzione) {
                 return opzioniAggiuntiveLabels[opzione] || opzione;
