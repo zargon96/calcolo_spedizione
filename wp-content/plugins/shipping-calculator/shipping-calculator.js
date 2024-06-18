@@ -325,10 +325,12 @@ jQuery(document).ready(function($) {
         });
 
         if (opzioniAggiuntive.includes('assicurazione')) {
+            //Controlla che il campo non può essere vuoto
             if (!assicurazioneValore) {
                 $('#assicurazione_valori').addClass('is-invalid');
                 $('#assicurazione_valore_invalid_feedback').text('ATTENZIONE: Il valore dell\'assicurazione non può essere vuoto.');
                 return;
+            //Minimo di 500
             } else if (assicurazioneValore < 500) {
                 $('#assicurazione_valori').addClass('is-invalid');
                 $('#assicurazione_valore_invalid_feedback').text('ATTENZIONE: Il valore dell\'assicurazione non può essere inferiore a 500 euro.');
