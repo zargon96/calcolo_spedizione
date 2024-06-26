@@ -403,16 +403,15 @@ jQuery(document).ready(function($) {
     });
 
     submitButton.click(function() {
+        resetFormValidation();
+        var invalidFields = [];
+
         $(fields.map(field => `#${field.replace(/\[/g, '\\[').replace(/\]/g, '\\]')}`).join(',')).each(function() {
-            validateField(this);
+            if (!validateField(this)) {
+                invalidFields.push(this);
+            }
         });
 
-        // Se ci sono errori nei campi, non inviare il form
-        var form = $('#spedizioneForm')[0];
-        if (!form.checkValidity()) {
-            alert('Per favore, compila tutti i campi obbligatori.');
-            return;
-        }
 
         var nomeMittente = $('#mittente\\[nome\\]').val();
         var indirizzoMittente = $('#mittente\\[indirizzo\\]').val();
@@ -512,9 +511,11 @@ jQuery(document).ready(function($) {
         if (field.checkValidity()) {
             field.classList.remove('is-invalid');
             field.classList.add('is-valid');
+            return true;
         } else {
             field.classList.remove('is-valid');
             field.classList.add('is-invalid');
+            return false;
         }
     }
 
@@ -525,18 +526,13 @@ jQuery(document).ready(function($) {
 
     // Associa l'evento 'click' al pulsante di submit
     submitButton.click(function() {
-        $(fields.map(field => `#${field.replace(/\[/g, '\\[').replace(/\]/g, '\\]')}`).join(',')).each(function() {
-            validateField(this);
-        });
+        resetFormValidation();
+        var invalidFields = [];
 
-        // Se ci sono errori nei campi, non inviare il form
-        var form = $('#spedizioneForm')[0];
-        if (!form.checkValidity()) {
-            alert('Per favore, compila tutti i campi obbligatori.');
-            return;
-        }
+        $(fields.map(field => `#${field.replace(/\[/g, '\\[').replace(/\]/g, '\\]')}`).join(',')).each(function() {
+            if (!validateField(this)) {
+                invalidFields.push(this);
+            }
+        });
     });
 });
-
-
-
