@@ -88,7 +88,8 @@ class Shipping_Calculator_Plugin {
                             'moltiplicatore' => $opzioni[$opzione]['moltiplicatore'],
                             'costo' => $costoAggiuntivo
                         ];
-                    } elseif ($opzione === 'contrassegno' && $contrassegnoValore > 0) {
+                    } 
+                    if ($opzione === 'contrassegno' && $contrassegnoValore > 0) {
                         $costoAggiuntivo = $contrassegnoValore * ($opzioni[$opzione]['moltiplicatore'] - 1);
                         $dettagliOpzioni['contrassegno'] = [
                             'valore' => $contrassegnoValore,
