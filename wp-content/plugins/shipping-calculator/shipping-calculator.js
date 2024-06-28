@@ -145,7 +145,6 @@ jQuery(document).ready(function($) {
     var previousSelectedPallet = null;
 
     $('#tipo_pallet_container').on('click', '.pallet-option', function() {
-        // Resetta la quantità del pallet precedentemente selezionato e nasconde la quantità
         if (previousSelectedPallet && previousSelectedPallet !== this) {
             $(previousSelectedPallet).find('.pallet-quantity').val(1);
             $(previousSelectedPallet).find('.quantity-container').hide();
@@ -155,20 +154,16 @@ jQuery(document).ready(function($) {
         $(this).addClass('selected');
         var selectedPallet = $(this).data('pallet');
         $('#tipo_pallet').val(selectedPallet);
-        disableNextButton(); // Disable the "Avanti" button initially
-        checkCalculateButton(); // Check the state of the calculate button
+        disableNextButton(); 
+        checkCalculateButton(); 
 
-        // Mostra la quantità del pallet selezionato
         $(this).find('.quantity-container').show();
 
-        // Imposta il pallet selezionato come il precedente
         previousSelectedPallet = this;
     });
 
-    // Nascondi tutte le quantità all'inizio
     $('.quantity-container').hide();
 
-    // Aggiungi event listener per i pulsanti di incremento e decremento
     $('#tipo_pallet_container').on('click', '.decrementQuantity', function() {
         var quantityInput = $(this).siblings('.pallet-quantity');
         var currentValue = parseInt(quantityInput.val());
@@ -205,7 +200,6 @@ jQuery(document).ready(function($) {
         });
     }
 
-    // Chiamata iniziale per aggiornare i nomi delle province
     updateProvinceDisplay();
 
     var partenzaSelect = $('#partenza');
@@ -230,10 +224,8 @@ jQuery(document).ready(function($) {
         'destinatario[email]'
     ];
 
-    // Disable the "Avanti" button initially
     nextbutton.prop('disabled', true);
 
-    // Initialize Select2 with tagging
     $('.js-example-tags').select2({
         tags: true,
     });
@@ -258,7 +250,6 @@ jQuery(document).ready(function($) {
         $('#provincia_destinatario').val(destinazione);
     }
 
-    // Gestisce la visualizzazione del menu a tendina per i valori dell'assicurazione
     $('#assicurazione').change(function() {
         if ($(this).is(':checked')) {
             $('#assicurazione_valori_container').show();
@@ -267,7 +258,14 @@ jQuery(document).ready(function($) {
         }
     });
 
-    // Disable the "Avanti" button when any select field is changed
+    $('#contrassegno').change(function() {
+        if ($(this).is(':checked')) {
+            $('#contrassegno_valori_container').show();
+        } else {
+            $('#contrassegno_valori_container').hide();
+        }
+    });
+
     function disableNextButton() {
         nextbutton.prop('disabled', true);
     }
@@ -295,7 +293,6 @@ jQuery(document).ready(function($) {
     tipoPalletSelect.change(disableNextButton);
     opzioniAggiuntiveSelect.change(disableNextButton);
 
-    // Inizializza i tipi di pallet e le province alla prima esecuzione
     updatePalletTypes();
     updateProvince();
     checkCalculateButton();
@@ -305,8 +302,18 @@ jQuery(document).ready(function($) {
             $('#assicurazione_valori_container').show();
         } else {
             $('#assicurazione_valori_container').hide();
-            $('#assicurazione_valori').val(''); // Resetta il valore
+            $('#assicurazione_valori').val(''); 
             $('#assicurazione_valori').removeClass('is-invalid');
+        }
+    });
+
+    $('#contrassegno').change(function() {
+        if ($(this).is(':checked')) {
+            $('#contrassegno_valori_container').show();
+        } else {
+            $('#contrassegno_valori_container').hide();
+            $('#contrassegno_valori').val(''); 
+            $('#contrassegno_valori').removeClass('is-invalid');
         }
     });
 
@@ -316,21 +323,19 @@ jQuery(document).ready(function($) {
         var tipoSpedizione = $('input[name="tipo_spedizione"]:checked').val();
         var tipoPallet = tipoPalletSelect.val();
         var quantita = $(`.pallet-option[data-pallet='${tipoPallet}'] .pallet-quantity`).val();
-        
 
         var assicurazioneValore = $('#assicurazione_valori').val();
+        var contrassegnoValore = $('#contrassegno_valori').val();
         var opzioniAggiuntive = [];
         $('#opzioni_aggiuntive input:checked').each(function() {
             opzioniAggiuntive.push($(this).val());
         });
 
         if (opzioniAggiuntive.includes('assicurazione')) {
-            //Controlla che il campo non può essere vuoto
             if (!assicurazioneValore) {
                 $('#assicurazione_valori').addClass('is-invalid');
                 $('#assicurazione_valore_invalid_feedback').text('ATTENZIONE: Il valore dell\'assicurazione non può essere vuoto.');
                 return;
-            //Minimo di 500
             } else if (assicurazioneValore < 500) {
                 $('#assicurazione_valori').addClass('is-invalid');
                 $('#assicurazione_valore_invalid_feedback').text('ATTENZIONE: Il valore dell\'assicurazione non può essere inferiore a 500 euro.');
@@ -340,7 +345,20 @@ jQuery(document).ready(function($) {
             }
         }
 
-        // Chiamata AJAX per calcolare il costo della spedizione
+        if (opzioniAggiuntive.includes('contrassegno')) {
+            if (!contrassegnoValore) {
+                $('#contrassegno_valori').addClass('is-invalid');
+                $('#contrassegno_valore_invalid_feedback').text('ATTENZIONE: Il valore del contrassegno non può essere vuoto.');
+                return;
+            } else if (contrassegnoValore < 50) {
+                $('#contrassegno_valori').addClass('is-invalid');
+                $('#contrassegno_valore_invalid_feedback').text('ATTENZIONE: Il valore del contrassegno non può essere inferiore a 50 euro.');
+                return;
+            } else {
+                $('#contrassegno_valori').removeClass('is-invalid');
+            }
+        }
+
         $.post('/wp-admin/admin-ajax.php', {
             action: 'calculate_shipping',
             partenza: partenza,
@@ -349,9 +367,11 @@ jQuery(document).ready(function($) {
             tipoPallet: tipoPallet,
             quantita: quantita,
             opzioniAggiuntive: opzioniAggiuntive,
-            assicurazioneValore: assicurazioneValore
+            assicurazioneValore: assicurazioneValore,
+            contrassegnoValore: contrassegnoValore
         }, function(response) {
-            $('#result').text('Il costo di spedizione è: €' + response);
+            var result = JSON.parse(response);
+            $('#result').text('Il costo di spedizione è: €' + result.costoSpedizione);
             $('#summaryPartenza').text(provinceMap[partenza] || partenza);
             $('#summaryDestinazione').text(provinceMap[destinazione] || destinazione);
             $('#summaryTipoSpedizione').text(tipoSpedizione);
@@ -363,27 +383,32 @@ jQuery(document).ready(function($) {
             });
 
             if (opzioniAggiuntiveReadable.length > 0) {
-                $('#summaryOpzioni').text(opzioniAggiuntiveReadable.join(', '));
+                $('#summaryOpzioni').html(opzioniAggiuntiveReadable.join(', '));
             } else {
                 $('#summaryOpzioni').text('Nessuna opzione aggiuntiva');
             }
 
-            // Aggiungi il valore dell'assicurazione solo se selezionato
-            if (opzioniAggiuntive.includes('assicurazione') && assicurazioneValore) {
-                $('#summaryOpzioni').append('<br>Valore Assicurazione: €' + assicurazioneValore);
+            var dettagliOpzioni = result.dettagliOpzioni;
+
+            if (dettagliOpzioni.assicurazione) {
+                $('#summaryOpzioni').append('<br>Valore Assicurazione: € ' + dettagliOpzioni.assicurazione.valore + ' + 2% ');
+               
             }
-            
-            $('#summaryCosto').text('€' + response);
-            $('#summary').removeClass('hidden'); // Mostra il riepilogo
+
+            if (dettagliOpzioni.contrassegno) {
+                $('#summaryOpzioni').append('<br>Valore Contrassegno: € ' + dettagliOpzioni.contrassegno.valore + ' + 2% ');
+               
+            }
+            $('#summaryCosto').html('€ ' + result.costoSpedizione);
+            $('#summary').removeClass('hidden'); 
             nextbutton.show();
-            nextbutton.prop('disabled', false); // Enable the "Avanti" button
+            nextbutton.prop('disabled', false);
         }).fail(function() {
             alert('Errore nel calcolo del costo di spedizione!');
         });
     });
 
     function resetFormValidation() {
-        // Rimuove le classi di errore e i messaggi di errore dai campi del form
         $(fields.map(field => `#${field.replace(/\[/g, '\\[').replace(/\]/g, '\\]')}`).join(',')).each(function() {
             $(this).removeClass('is-invalid');
             $(this).removeClass('is-valid');
@@ -392,14 +417,14 @@ jQuery(document).ready(function($) {
 
     nextbutton.click(function() {
         $('#spedizioneForm').hide();
-        datiPersonaliDiv.show(); // Mostra i campi dei dati anagrafici
+        datiPersonaliDiv.show(); 
     });
 
     backButton.click(function() {
         resetFormValidation();
         datiPersonaliDiv.hide();
-        $('#spedizioneForm').show(); // Mostra il modulo di spedizione
-        disableNextButton(); // Disable the "Avanti" button when going back
+        $('#spedizioneForm').show(); 
+        disableNextButton(); 
     });
 
     submitButton.click(function() {
@@ -411,7 +436,6 @@ jQuery(document).ready(function($) {
                 invalidFields.push(this);
             }
         });
-
 
         var nomeMittente = $('#mittente\\[nome\\]').val();
         var indirizzoMittente = $('#mittente\\[indirizzo\\]').val();
@@ -438,8 +462,8 @@ jQuery(document).ready(function($) {
         });
         var costoSpedizione = $('#result').text().split('€')[1].trim();
         var assicurazioneValore = $('#assicurazione_valori').val();
+        var contrassegnoValore = $('#contrassegno_valori').val();
 
-        // Chiamata AJAX per inviare la richiesta
         $.post('/wp-admin/admin-ajax.php', {
             action: 'submit_request',
             'mittente[nome]': nomeMittente,
@@ -461,52 +485,45 @@ jQuery(document).ready(function($) {
             quantita: quantita,
             opzioniAggiuntive: opzioniAggiuntive,
             costoSpedizione: costoSpedizione,
-            assicurazioneValore: assicurazioneValore
+            assicurazioneValore: assicurazioneValore,
+            contrassegnoValore: contrassegnoValore
         }, function(response) {
             if (response.success) {
-                // Mostra l'avviso di successo
                 $('#alertContainer').html('<div class="alert alert-success alert-dismissible fade show" role="alert">Richiesta inviata con successo.<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
             } else {
-                $('.alert').remove(); // Rimuovi eventuali avvisi esistenti
+                $('.alert').remove(); 
                 $('#alertContainer').prepend('<div class="alert alert-danger alert-dismissible fade show" role="alert">Errore: ' + response.data.errors.join('') + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');    
-                // Scrolla alla posizione dell'alert di errore
                 $('html, body').animate({
                     scrollTop: $('#alertContainer').offset().top
                 }, 'slow');            
             }
         }).fail(function() {
-            $('.alert').remove(); // Rimuovi eventuali avvisi esistenti
+            $('.alert').remove(); 
             $('#alertContainer').prepend('<div class="alert alert-danger alert-dismissible fade show" role="alert">Errore di rete. Per favore riprova più tardi.<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');    
-            // Scrolla alla posizione dell'alert di errore
             $('html, body').animate({
                 scrollTop: $('#alertContainer').offset().top
             }, 'slow');
         });
     });
 
-    // Funzione per permettere solo numeri nei campi CAP e massimo 5 cifre
     $('#mittente\\[cap\\], #destinatario\\[cap\\]').on('input', function() {
         this.value = this.value.replace(/\D/g, '').substring(0, 5);
     });
 
-    // Funzione per permettere solo numeri nel cellulare con massimo 10 cifre
     $('#mittente\\[telefono\\], #destinatario\\[telefono\\]').on('input', function() {
         this.value = this.value.replace(/\D/g, '').substring(0, 10);
     });
 
-    // Funzione per permettere solo lettere
     function allowOnlyLetters(input) {
         var value = input.value;
         var regex = /[^a-zA-Z\s]/g;
         input.value = value.replace(regex, '');
     }
 
-    // Associa l'evento 'input' ai campi 'nominativo' e 'città'
     $('#mittente\\[citta\\],#destinatario\\[citta\\]').on('input', function() {
         allowOnlyLetters(this);
     });
 
-    // Funzioni di validazione con classi bootstrap
     function validateField(field) {
         if (field.checkValidity()) {
             field.classList.remove('is-invalid');
@@ -519,12 +536,10 @@ jQuery(document).ready(function($) {
         }
     }
 
-    // Associa l'evento 'input' a tutti i campi nell'array
     $(fields.map(field => `#${field.replace(/\[/g, '\\[').replace(/\]/g, '\\]')}`).join(',')).on('input', function() {
         validateField(this);
     });
 
-    // Associa l'evento 'click' al pulsante di submit
     submitButton.click(function() {
         resetFormValidation();
         var invalidFields = [];
@@ -536,3 +551,5 @@ jQuery(document).ready(function($) {
         });
     });
 });
+
+
