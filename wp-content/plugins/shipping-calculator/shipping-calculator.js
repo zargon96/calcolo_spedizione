@@ -162,6 +162,13 @@ jQuery(document).ready(function($) {
         previousSelectedPallet = this;
     });
 
+    // Funzione per abilitare/disabilitare le checkbox delle opzioni aggiuntive
+    function toggleCheckboxes(enable) {
+        $('#opzioni_aggiuntive input[type="checkbox"]').prop('disabled', !enable);
+    }
+
+    // Inizialmente disabilita tutte le checkbox
+    toggleCheckboxes(false);
     $('.quantity-container').hide();
 
     $('#tipo_pallet_container').on('click', '.decrementQuantity', function() {
@@ -176,6 +183,26 @@ jQuery(document).ready(function($) {
         var quantityInput = $(this).siblings('.pallet-quantity');
         var currentValue = parseInt(quantityInput.val());
         quantityInput.val(currentValue + 1);
+    });
+
+    $('#tipo_pallet_container').on('click', '.pallet-option', function() {
+        if (previousSelectedPallet && previousSelectedPallet !== this) {
+            $(previousSelectedPallet).find('.pallet-quantity').val(1);
+            $(previousSelectedPallet).find('.quantity-container').hide();
+        }
+        
+        $('.pallet-option').removeClass('selected');
+        $(this).addClass('selected');
+        var selectedPallet = $(this).data('pallet');
+        $('#tipo_pallet').val(selectedPallet);
+        disableNextButton(); 
+        checkCalculateButton(); 
+    
+        $(this).find('.quantity-container').show();
+        previousSelectedPallet = this;
+    
+        // Abilita le checkbox delle opzioni aggiuntive
+        toggleCheckboxes(true);
     });
 
     var calculateButton = $('#calculateButton');
@@ -253,6 +280,7 @@ jQuery(document).ready(function($) {
     $('#assicurazione').change(function() {
         if ($(this).is(':checked')) {
             $('#assicurazione_valori_container').show();
+            triggerCalculate(); // Trigger the calculation when assicurazione is checked
         } else {
             $('#assicurazione_valori_container').hide();
         }
@@ -317,48 +345,27 @@ jQuery(document).ready(function($) {
         }
     });
 
+    function toggleCheckboxes(enable) {
+        $('#opzioni_aggiuntive input[type="checkbox"]').prop('disabled', !enable);
+    }
+
+    // Inizialmente disabilita tutte le checkbox
+    toggleCheckboxes(false);
+
     calculateButton.click(function() {
         var partenza = partenzaSelect.val();
         var destinazione = destinazioneSelect.val();
         var tipoSpedizione = $('input[name="tipo_spedizione"]:checked').val();
         var tipoPallet = tipoPalletSelect.val();
         var quantita = $(`.pallet-option[data-pallet='${tipoPallet}'] .pallet-quantity`).val();
-
+    
         var assicurazioneValore = $('#assicurazione_valori').val();
         var contrassegnoValore = $('#contrassegno_valori').val();
         var opzioniAggiuntive = [];
         $('#opzioni_aggiuntive input:checked').each(function() {
             opzioniAggiuntive.push($(this).val());
         });
-
-        if (opzioniAggiuntive.includes('assicurazione')) {
-            if (!assicurazioneValore) {
-                $('#assicurazione_valori').addClass('is-invalid');
-                $('#assicurazione_valore_invalid_feedback').text('ATTENZIONE: Il valore dell\'assicurazione non può essere vuoto.');
-                return;
-            } else if (assicurazioneValore < 500) {
-                $('#assicurazione_valori').addClass('is-invalid');
-                $('#assicurazione_valore_invalid_feedback').text('ATTENZIONE: Il valore dell\'assicurazione non può essere inferiore a 500 euro.');
-                return;
-            } else {
-                $('#assicurazione_valori').removeClass('is-invalid');
-            }
-        }
-
-        if (opzioniAggiuntive.includes('contrassegno')) {
-            if (!contrassegnoValore) {
-                $('#contrassegno_valori').addClass('is-invalid');
-                $('#contrassegno_valore_invalid_feedback').text('ATTENZIONE: Il valore del contrassegno non può essere vuoto.');
-                return;
-            } else if (contrassegnoValore < 50) {
-                $('#contrassegno_valori').addClass('is-invalid');
-                $('#contrassegno_valore_invalid_feedback').text('ATTENZIONE: Il valore del contrassegno non può essere inferiore a 50 euro.');
-                return;
-            } else {
-                $('#contrassegno_valori').removeClass('is-invalid');
-            }
-        }
-
+    
         $.post('/wp-admin/admin-ajax.php', {
             action: 'calculate_shipping',
             partenza: partenza,
@@ -371,33 +378,70 @@ jQuery(document).ready(function($) {
             contrassegnoValore: contrassegnoValore
         }, function(response) {
             var result = JSON.parse(response);
+            var costoSpedizione = parseFloat(result.costoSpedizione);
+            var baseCostoSpedizione = parseFloat(result.baseCostoSpedizione);
+    
+            // Update the minimum value and message of assicurazione based on the shipping cost
+            var newMinAssicurazione = baseCostoSpedizione * 0.10;
+            $('#assicurazione_valori').attr('min', newMinAssicurazione);
+            $('#assicurazione_valore_invalid_feedback').text('ATTENZIONE: Il valore dell\'assicurazione non può essere inferiore a €' + newMinAssicurazione.toFixed(2));
+            $('#assicurazione_valori_container .help-block').text('(Minimo ' + newMinAssicurazione.toFixed(2) + ' euro)');
+    
+            // Validate assicurazione value dynamically
+            if (opzioniAggiuntive.includes('assicurazione')) {
+                if (!assicurazioneValore) {
+                    $('#assicurazione_valori').addClass('is-invalid');
+                    $('#assicurazione_valore_invalid_feedback').text('ATTENZIONE: Il valore dell\'assicurazione non può essere vuoto.');
+                    return;
+                } else if (assicurazioneValore < newMinAssicurazione) {
+                    $('#assicurazione_valori').addClass('is-invalid');
+                    $('#assicurazione_valore_invalid_feedback').text('ATTENZIONE: Il valore dell\'assicurazione non può essere inferiore a €' + newMinAssicurazione.toFixed(2));
+                    return;
+                } else {
+                    $('#assicurazione_valori').removeClass('is-invalid');
+                }
+            }
+    
+            // Validate contrassegno value
+            if (opzioniAggiuntive.includes('contrassegno')) {
+                if (!contrassegnoValore) {
+                    $('#contrassegno_valori').addClass('is-invalid');
+                    $('#contrassegno_valore_invalid_feedback').text('ATTENZIONE: Il valore del contrassegno non può essere vuoto.');
+                    return;
+                } else if (contrassegnoValore < 50) {
+                    $('#contrassegno_valori').addClass('is-invalid');
+                    $('#contrassegno_valore_invalid_feedback').text('ATTENZIONE: Il valore del contrassegno non può essere inferiore a 50 euro.');
+                    return;
+                } else {
+                    $('#contrassegno_valori').removeClass('is-invalid');
+                }
+            }
+    
             $('#result').text('Il costo di spedizione è: €' + result.costoSpedizione);
             $('#summaryPartenza').text(provinceMap[partenza] || partenza);
             $('#summaryDestinazione').text(provinceMap[destinazione] || destinazione);
             $('#summaryTipoSpedizione').text(tipoSpedizione);
             $('#summaryTipoPallet').text(tipoPallet);
             $('#summaryQuantita').text(quantita);
-
+    
             var opzioniAggiuntiveReadable = opzioniAggiuntive.map(function(opzione) {
                 return opzioniAggiuntiveLabels[opzione] || opzione;
             });
-
+    
             if (opzioniAggiuntiveReadable.length > 0) {
                 $('#summaryOpzioni').html(opzioniAggiuntiveReadable.join(', '));
             } else {
                 $('#summaryOpzioni').text('Nessuna opzione aggiuntiva');
             }
-
+    
             var dettagliOpzioni = result.dettagliOpzioni;
-
+    
             if (dettagliOpzioni.assicurazione) {
-                $('#summaryOpzioni').append('<br>Valore Assicurazione: € ' + dettagliOpzioni.assicurazione.valore + ' + 2% ');
-               
+                $('#summaryOpzioni').append('<br>Valore Assicurazione: € ' + dettagliOpzioni.assicurazione.valore);
             }
-
+    
             if (dettagliOpzioni.contrassegno) {
-                $('#summaryOpzioni').append('<br>Valore Contrassegno: € ' + dettagliOpzioni.contrassegno.valore + ' + 2% ');
-               
+                $('#summaryOpzioni').append('<br>Valore Contrassegno: € ' + dettagliOpzioni.contrassegno.valore);
             }
             $('#summaryCosto').html('€ ' + result.costoSpedizione);
             $('#summary').removeClass('hidden'); 
@@ -407,6 +451,7 @@ jQuery(document).ready(function($) {
             alert('Errore nel calcolo del costo di spedizione!');
         });
     });
+    
 
     function resetFormValidation() {
         $(fields.map(field => `#${field.replace(/\[/g, '\\[').replace(/\]/g, '\\]')}`).join(',')).each(function() {

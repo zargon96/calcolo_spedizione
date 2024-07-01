@@ -142,41 +142,42 @@ echo "<script>var shippingData = $json_data;</script>";
             <div class="form-group">
                 <h4>Opzioni aggiuntive:</h4>
                 <div id="opzioni_aggiuntive">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="opzioni_aggiuntive[]" id="sponda_idraulica" value="sponda_idraulica">
-                        <label class="form-check-label" for="sponda_idraulica">Consegna con sponda idraulica</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="opzioni_aggiuntive[]" id="assicurazione" value="assicurazione">
-                        <label class="form-check-label" for="assicurazione">Assicurazione</label>
-                    </div>
-                    <div id="assicurazione_valori_container" class="mt-2 mb-2" style="display: none;">
-                        <label for="assicurazione_valori">Inserisci il valore dell'assicurazione:</label>
-                        <p class="help-block">(Minimo 500 euro)</p>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">€</span>
-                            </div>
-                            <input type="number" class="form-control" id="assicurazione_valori" name="assicurazione_valori" min="500" required>
-                            <div class="invalid-feedback" id="assicurazione_valore_invalid_feedback"></div>
-                        </div>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="opzioni_aggiuntive[]" id="contrassegno" value="contrassegno">
-                        <label class="form-check-label" for="contrassegno">Contrassegno</label>
-                    </div>
-                    <div id="contrassegno_valori_container" class="mt-2" style="display: none;">
-                        <label for="contrassegno_valori">Inserisci il valore del contrassegno:</label>
-                        <p class="help-block">(Minimo 50 euro)</p>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">€</span>
-                            </div>
-                            <input type="number" class="form-control" id="contrassegno_valori" name="contrassegno_valori" min="50" required>
-                            <div class="invalid-feedback" id="contrassegno_valore_invalid_feedback"></div>
-                        </div>
-                    </div>
-                </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="opzioni_aggiuntive[]" id="sponda_idraulica" value="sponda_idraulica" disabled>
+        <label class="form-check-label" for="sponda_idraulica">Consegna con sponda idraulica</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="opzioni_aggiuntive[]" id="assicurazione" value="assicurazione" disabled>
+        <label class="form-check-label" for="assicurazione">Assicurazione</label>
+    </div>
+    <div id="assicurazione_valori_container" class="mt-2 mb-2" style="display: none;">
+        <label for="assicurazione_valori">Inserisci il valore dell'assicurazione:</label>
+        <p class="help-block">(Minimo 500 euro)</p>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">€</span>
+            </div>
+            <input type="number" class="form-control" id="assicurazione_valori" name="assicurazione_valori" min="500" required>
+            <div class="invalid-feedback" id="assicurazione_valore_invalid_feedback"></div>
+        </div>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="opzioni_aggiuntive[]" id="contrassegno" value="contrassegno" disabled>
+        <label class="form-check-label" for="contrassegno">Contrassegno</label>
+    </div>
+    <div id="contrassegno_valori_container" class="mt-2" style="display: none;">
+        <label for="contrassegno_valori">Inserisci il valore del contrassegno:</label>
+        <p class="help-block">(Minimo 50 euro)</p>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">€</span>
+            </div>
+            <input type="number" class="form-control" id="contrassegno_valori" name="contrassegno_valori" min="50" required>
+            <div class="invalid-feedback" id="contrassegno_valore_invalid_feedback"></div>
+        </div>
+    </div>
+</div>
+
             </div>
             <div class="col-md-12">
                 <button type="button" class="btn btn-primary" id="calculateButton" disabled>Calcola tariffa</button>

@@ -115,8 +115,10 @@ class Shipping_Calculator_Plugin {
     
         echo json_encode([
             'costoSpedizione' => number_format($costoSpedizione, 2),
-            'dettagliOpzioni' => $dettagliOpzioni
+            'dettagliOpzioni' => $dettagliOpzioni,
+            'baseCostoSpedizione' => $tariffaBase
         ]);
+        wp_die();
         wp_die();
     }
     
